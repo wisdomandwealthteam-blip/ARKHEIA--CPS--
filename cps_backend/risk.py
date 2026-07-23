@@ -1,41 +1,48 @@
-from enum import Enum
+from dataclasses import dataclass
 from typing import Dict, Any
 
-
-class RiskLevel(Enum):
-    LOW = "LOW"
-    MEDIUM = "MEDIUM"
-    HIGH = "HIGH"
+from cps_backend.response import ok, fail
 
 
-# Deterministic high-risk fields (Claude-approved)
-_HIGH_RISK_FIELDS = frozenset({
-    "apr",
-    "affordability",
-    "doc_fee",
-    "fees",
-})
-
-
-def compute_risk_level(flags: Dict[str, Any]) -> RiskLevel:
+@dataclass
+class RiskAssessment:
     """
-    Deterministic mapping from flag set -> tier.
-
-    Guardrail-compliant:
-    - No heuristics
-    - No scoring
-    - No weighting
-    - No generative logic
-    - Pure structural mapping
+    Deterministic CPS risk assessment model.
+    Replace with real logic as ARKHEIA-CPS evolves.
     """
 
-    # No flags → LOW
-    if not flags:
-        return RiskLevel.LOW
+    case_id: str
+    factors: Dict[str, Any]
 
-    # Any high-risk field → HIGH
-    if any(name in _HIGH_RISK_FIELDS for name in flags.keys()):
-        return RiskLevel.HIGH
+    def compute(self) -> Dict[str, Any]:
+        """
+        Deterministic placeholder logic.
+        Produces a stable, predictable risk score.
+        """
+        score = 0
 
-    # Everything else → MEDIUM
-    return RiskLevel.MEDIUM
+        # Example deterministic scoring logic
+        for key, value in self.factors.items():
+            if isinstance(value, (int, float)):
+                score += value
+            elif isinstance(value, str):
+                score += len(value)
+
+        return {
+            "case_id": self.case_id,
+            "risk_score": score,
+            "details": self.factors,
+        }
+
+
+def assess(case_id: str, factors: Dict[str, Any]):
+    """
+    Public API wrapper for risk assessment.
+    Always returns a ResponseEnvelope.
+    """
+    try:
+        model = RiskAssessment(case_id=case_id, factors=factors)
+        result = model.compute()
+        return ok(result)
+    except Exception as exc:
+        return fail(f"Risk assessment failed: {exc}")
