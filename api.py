@@ -1,41 +1,24 @@
-from typing import Any, Dict
+from typing import Dict, Any
 
-from .registry import REGISTRY
-from .response import EvaluationResponse, FlagDetail
-from .risk import compute_risk_level, RiskLevel
+from cps_backend.response import ok, fail
+from cps_backend.risk import assess as assess_risk
 
 
-def evaluate_contract(vertical: str, contract: Any) -> EvaluationResponse:
+def health() -> Dict[str, Any]:
     """
-    Unified Response Schema wrapper.
-    Guardrail-compliant:
-    - contract is a typed dataclass instance (not __dict__)
-    - flags are structured FlagDetail objects
-    - risk_level is deterministic (RiskLevel enum)
-    - statutory_hits is typed (List[StatuteCitation])
+    Simple deterministic health check endpoint.
+    Returns a ResponseEnvelope via ok().
     """
+    return ok({"status": "online", "module": "cps_backend.api"}).to_dict()
 
-    if vertical not in REGISTRY:
-        raise ValueError(f"Unknown vertical: {vertical}")
 
-    evaluator = REGISTRY[vertical]
-    raw_flags: Dict[str, Any] = evaluator(contract)
-
-    flags: Dict[str, FlagDetail] = {}
-    for name, value in raw_flags.items():
-        flags[name] = FlagDetail(
-            flag_name=name,
-            actual_value=getattr(contract, name, None),
-            threshold_value=None,
-            statute_ref=None,
-        )
-
-    risk_level: RiskLevel = compute_risk_level(raw_flags)
-
-    return EvaluationResponse(
-        vertical=vertical,
-        inputs=contract,      # typed dataclass instance
-        flags=flags,
-        risk_level=risk_level,
-        statutory_hits=[],    # List[StatuteCitation], empty for now
-    )
+def risk(case_id: str, factors: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Public API endpoint for risk assessment.
+    Wraps the risk module and returns a deterministic envelope.
+    """
+    try:
+        envelope = assess_risk(case_id, factors)
+        return envelope.to_dict()
+    except Exception as exc:
+        return fail(f"API risk endpoint failure: {exc}").to_dict()
