@@ -1,48 +1,26 @@
-from dataclasses import dataclass
 from typing import Dict, Any
 
-from cps_backend.response import ok, fail
 
-
-@dataclass
-class RiskAssessment:
+def aggregate_risk(results: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Deterministic CPS risk assessment model.
-    Replace with real logic as ARKHEIA-CPS evolves.
+    Deterministic ARKHEIA-CPS risk aggregation.
+    Takes evaluator outputs and produces a unified risk envelope.
     """
 
-    case_id: str
-    factors: Dict[str, Any]
+    score = 0
+    details = {}
 
-    def compute(self) -> Dict[str, Any]:
-        """
-        Deterministic placeholder logic.
-        Produces a stable, predictable risk score.
-        """
-        score = 0
+    for key, value in results.items():
+        details[key] = value
 
-        # Example deterministic scoring logic
-        for key, value in self.factors.items():
-            if isinstance(value, (int, float)):
-                score += value
-            elif isinstance(value, str):
-                score += len(value)
+        if isinstance(value, (int, float)):
+            score += value
+        elif isinstance(value, str):
+            score += len(value)
+        elif isinstance(value, dict):
+            score += len(value)
 
-        return {
-            "case_id": self.case_id,
-            "risk_score": score,
-            "details": self.factors,
-        }
-
-
-def assess(case_id: str, factors: Dict[str, Any]):
-    """
-    Public API wrapper for risk assessment.
-    Always returns a ResponseEnvelope.
-    """
-    try:
-        model = RiskAssessment(case_id=case_id, factors=factors)
-        result = model.compute()
-        return ok(result)
-    except Exception as exc:
-        return fail(f"Risk assessment failed: {exc}")
+    return {
+        "risk_score": score,
+        "details": details,
+    }
