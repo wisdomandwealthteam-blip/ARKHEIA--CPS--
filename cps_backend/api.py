@@ -1,9 +1,8 @@
-from fastapi import FastAPI
-from fastapi import HTTPException
+from fastapi import FastAPI, HTTPException
 
-from schemas import AutoContractIn, HousingContractIn
-from registry import REGISTRY
-from risk import aggregate_risk
+from cps_backend.registry import REGISTRY
+from cps_backend.schemas import AutoContractIn, HousingContractIn
+from cps_backend.risk import aggregate_risk
 
 app = FastAPI()
 
@@ -33,30 +32,3 @@ def risk_housing(contract: HousingContractIn):
     results = evaluator(contract)
     aggregated = aggregate_risk(results)
     return {"type": "HOUSING", "raw": results, "aggregated": aggregated}
-
-
-@app.get("/registry")
-def registry():
-    return {"registered": list(REGISTRY.keys())}
-
-
-@app.get("/status")
-def status():
-    return {
-        "status": "ok",
-        "message": "System operational",
-        "evaluators": list(REGISTRY.keys())
-    }
-
-
-@app.get("/dashboard")
-def dashboard():
-    return {
-        "status": "ok",
-        "message": "Dashboard endpoint is live",
-        "data": {
-            "active_cases": 0,
-            "pending_reviews": 0,
-            "system_health": "green"
-        }
-    }
