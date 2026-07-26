@@ -6,6 +6,7 @@ from cps_backend.risk import assess as assess_risk
 
 app = FastAPI()
 
+@app.get("/health")
 def health() -> Dict[str, Any]:
     """
     Simple deterministic health check endpoint.
@@ -14,6 +15,7 @@ def health() -> Dict[str, Any]:
     return ok({"status": "online", "module": "cps_backend.api"}).to_dict()
 
 
+@app.post("/risk")
 def risk(case_id: str, factors: Dict[str, Any]) -> Dict[str, Any]:
     """
     Public API endpoint for risk assessment.
@@ -26,6 +28,6 @@ def risk(case_id: str, factors: Dict[str, Any]) -> Dict[str, Any]:
         return fail(f"API risk endpoint failure: {exc}").to_dict()
 
 
-# NEW: include the real-time stream router
+# Real-time CPS stream router
 from stream import router as stream_router
 app.include_router(stream_router)
