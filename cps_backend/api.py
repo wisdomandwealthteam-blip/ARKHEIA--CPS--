@@ -22,3 +22,5 @@ def risk(case_id: str, factors: Dict[str, Any]) -> Dict[str, Any]:
         return envelope.to_dict()
     except Exception as exc:
         return fail(f"API risk endpoint failure: {exc}").to_dict()
+from stream import router as stream_router
+app.include_router(stream_router)
