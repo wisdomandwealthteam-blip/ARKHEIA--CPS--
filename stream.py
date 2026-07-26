@@ -1,24 +1,10 @@
-from fastapi import APIRouter
-from fastapi.responses import StreamingResponse
-import time
-import json
-
-router = APIRouter()
-
-def event_stream():
-    while True:
-        payload = {
-            "timestamp": time.time(),
-            "status": "ok",
-            "metrics": {
-                "load": 0.42,
-                "risk": 0.13,
-                "registry_count": 7
-            }
-        }
-        yield f"data: {json.dumps(payload)}\n\n"
-        time.sleep(1)
-
-@router.get("/stream")
-async def stream():
-    return StreamingResponse(event_stream(), media_type="text/event-stream")
+payload = {
+    "timestamp": time.time(),
+    "status": "ok",
+    "metrics": {
+        "risk_score": round(random.uniform(0.0, 1.0), 3),
+        "risk_level": "low" if random.random() < 0.5 else "high",
+        "case_load": random.randint(1, 20),
+        "active_cases": random.randint(1, 10)
+    }
+}
