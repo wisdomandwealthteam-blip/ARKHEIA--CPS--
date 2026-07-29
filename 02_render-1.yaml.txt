@@ -1,0 +1,42 @@
+services:
+  - type: web
+    name: arkheia-cps-backend
+    env: python
+    plan: starter
+    region: oregon
+
+    buildCommand: pip install -r requirements.txt
+
+    startCommand: uvicorn cps_backend.main:app --host 0.0.0.0 --port $PORT
+
+    autoDeploy: true
+
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: CPS_ENV
+        value: production
+      - key: CPS_REQUIRE_AUTH
+        value: "true"
+      - key: CPS_API_KEYS
+        sync: false
+      - key: CPS_ALLOWED_ORIGINS
+        sync: false
+      - key: CPS_RATE_LIMIT_ENABLED
+        value: "true"
+      - key: CPS_RATE_LIMIT_FREE
+        value: "30"
+      - key: CPS_RATE_LIMIT_PAID
+        value: "600"
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_PRICE_ID_PRO
+        sync: false
+      - key: STRIPE_PRICE_ID_ENTERPRISE
+        sync: false
+      - key: CPS_FRONTEND_BASE_URL
+        sync: false
+      - key: CPS_BILLING_STORE_PATH
+        value: data/subscriptions.json
