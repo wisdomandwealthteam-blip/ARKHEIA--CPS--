@@ -1,4 +1,4 @@
-"""# telemetry test: creating a PR event for Scott's Law pipeline
+"""# telemetry test: creating a PR event for Scott's Law pipeline# telemetry test 2: closing without merge
 cps_backend.main
 ===================
 Application entry point. Run locally with:
