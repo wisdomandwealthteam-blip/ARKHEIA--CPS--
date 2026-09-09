@@ -13,7 +13,7 @@ router = APIRouter(tags=["system"])
 
 APP_VERSION = "0.2.0"
 
-
+@router.head("/health", response_model=HealthResponse)
 @router.get("/health", response_model=HealthResponse)
 def health() -> HealthResponse:
     return HealthResponse(
