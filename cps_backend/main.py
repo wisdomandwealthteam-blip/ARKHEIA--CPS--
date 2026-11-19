@@ -32,6 +32,32 @@ app = FastAPI(
     version="0.2.0",
 )
 
+# Production Frontend <-> Backend Integration
+#
+# Verified Production Flow:
+# Frontend: https://fairnes.netlify.app
+# Backend:  https://arkheia-cps-10.onrender.com
+#
+# CORS origins are normalized at startup to prevent issues caused by:
+# - trailing whitespace
+# - leading whitespace
+# - newline characters
+# - duplicate origin entries
+#
+# Required production origin:
+# https://fairnes.netlify.app
+#
+# Verified flow:
+# Step 1: Client-side PII masking/redaction
+# Step 2: POST /api/clearcheck/preview
+# Step 3: Full report access gated through
+#         POST /api/clearcheck/checkout
+#
+# Health endpoint:
+# GET /health
+#
+# Smoke-test verified:
+# fairnes.netlify.app <-> arkheia-cps-10.onrender.com
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.allowed_origins,
