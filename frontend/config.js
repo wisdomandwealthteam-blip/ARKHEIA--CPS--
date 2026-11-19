@@ -16,7 +16,7 @@
   "use strict";
 
   var LOCAL_API = "http://localhost:8000";
-  var DEPLOYED_API = "https://arkheia-cps-13.onrender.com";
+  var DEPLOYED_API = "https://arkheia-cps-10.onrender.com";
   var STORAGE_KEY = "arkheia_api_base";
 
   function sanitize(url) {

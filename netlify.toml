@@ -3,7 +3,7 @@
 # The frontend is static (no build step) and lives in frontend/. It
 # resolves its API base at runtime (see frontend/config.js):
 #   - on localhost       -> http://localhost:8000
-#   - on the deployed site -> https://arkheia-cps-13.onrender.com
+#   - on the deployed site -> https://arkheia-cps-10.onrender.com
 #   - override anywhere via ?api=<url>
 #
 # IMPORTANT: the Render backend must list this site's origin (e.g.

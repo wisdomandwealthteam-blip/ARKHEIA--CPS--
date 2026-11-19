@@ -36,7 +36,7 @@ The consumer-facing ClearCheck UI is a static site (no build step) in
 
 - `?api=<url>` query parameter (persisted to localStorage) — highest priority
 - on `localhost` / `127.0.0.1` — `http://localhost:8000`
-- anywhere else (the deployed Netlify site) — `https://arkheia-cps-13.onrender.com`
+- anywhere else (the deployed Netlify site) — `https://arkheia-cps-10.onrender.com`
 
 ### Local testing
 
