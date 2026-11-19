@@ -22,7 +22,24 @@ def _env_list(name: str, default: list[str]) -> list[str]:
     val = os.environ.get(name)
     if val is None:
         return default
+    # Strip surrounding whitespace/newlines; an empty or whitespace-only
+    # value falls back to the default rather than producing an empty list.
+    val = val.strip()
+    if not val:
+        return default
     return [v.strip() for v in val.split(",") if v.strip()]
+
+
+# The production frontend origin — always allowed regardless of any
+# formatting quirks in the CPS_ALLOWED_ORIGINS environment variable.
+FRONTEND_ORIGIN = "https://fairnes.netlify.app"
+
+
+def _allowed_origins() -> list[str]:
+    origins = _env_list("CPS_ALLOWED_ORIGINS", ["*"])
+    if FRONTEND_ORIGIN not in origins:
+        origins.append(FRONTEND_ORIGIN)
+    return origins
 
 
 @dataclass(frozen=True)
@@ -32,9 +49,7 @@ class Settings:
     log_level: str = os.environ.get("CPS_LOG_LEVEL", "INFO")
 
     # CORS — restrict this in production via CPS_ALLOWED_ORIGINS
-    allowed_origins: list[str] = field(
-        default_factory=lambda: _env_list("CPS_ALLOWED_ORIGINS", ["*"])
-    )
+    allowed_origins: list[str] = field(default_factory=_allowed_origins)
 
     # Auth — token-based scaffolding. In development, auth can be disabled.
     require_auth: bool = _env_bool("CPS_REQUIRE_AUTH", False)
