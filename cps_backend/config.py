@@ -77,5 +77,15 @@ class Settings:
         "CPS_BILLING_STORE_PATH", "data/subscriptions.json"
     )
 
+    # ClearCheck consumer product: where check records (and processed
+    # Stripe event IDs for webhook idempotency) are persisted, and the
+    # one-time unlock price in USD cents.
+    clearcheck_store_path: str = os.environ.get(
+        "CPS_CLEARCHECK_STORE_PATH", "data/clearcheck_checks.json"
+    )
+    clearcheck_price_cents: int = int(
+        os.environ.get("CPS_CLEARCHECK_PRICE_CENTS", "999")
+    )
+
 
 settings = Settings()

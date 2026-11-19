@@ -12,12 +12,16 @@ functions will work against real Stripe — see docs/BILLING.md.
 """
 from __future__ import annotations
 
+from typing import Any
+
 import stripe
 
 from cps_backend.config import settings
+from cps_backend.services import clearcheck_store
 from cps_backend.services.billing_store import SubscriptionRecord, upsert_subscription
 from cps_backend.services.tiers import Tier
 from cps_backend.utils.logging_setup import logger
+from cps_backend.utils.redaction import mask_email
 
 stripe.api_key = settings.stripe_secret_key
 
@@ -86,10 +90,49 @@ def create_checkout_session(
         subscription_data={"metadata": {"tenant_id": tenant_id}},
     )
     logger.info(
-        "checkout session created tenant=%s tier=%s session_id=%s",
+        "checkout session created tenant=%s tier=%s session_id=%s customer_email=%s",
         tenant_id,
         tier.value,
         session.id,
+        mask_email(customer_email),
+    )
+    return session.url
+
+
+def create_clearcheck_checkout_session(
+    check_id: str,
+    customer_email: str | None = None,
+) -> str:
+    """Creates a one-time-payment Stripe Checkout session that unlocks
+    the full ClearCheck report for `check_id`. The check_id travels in
+    the session metadata — that's how the checkout.session.completed
+    webhook knows which check to unlock."""
+    _require_configured()
+
+    session = stripe.checkout.Session.create(
+        mode="payment",
+        line_items=[
+            {
+                "price_data": {
+                    "currency": "usd",
+                    "unit_amount": settings.clearcheck_price_cents,
+                    "product_data": {"name": "ClearCheck full report"},
+                },
+                "quantity": 1,
+            }
+        ],
+        success_url=f"{settings.frontend_base_url}/?clearcheck=success",
+        cancel_url=f"{settings.frontend_base_url}/?clearcheck=cancelled",
+        customer_email=customer_email,
+        client_reference_id=check_id,
+        metadata={"purpose": "clearcheck_unlock", "check_id": check_id},
+    )
+    logger.info(
+        "clearcheck checkout session created check_id=%s session_id=%s "
+        "customer_email=%s",
+        check_id,
+        session.id,
+        mask_email(customer_email),
     )
     return session.url
 
@@ -120,6 +163,16 @@ def construct_webhook_event(payload: bytes, sig_header: str) -> stripe.Event:
     )
 
 
+def _as_dict(obj: Any) -> dict:
+    """Normalizes a Stripe typed resource (Session, Subscription, …) to a
+    plain dict. Modern stripe-python returns typed objects whose dict
+    methods like .get() are disabled; handlers below work with dicts."""
+    if isinstance(obj, dict):
+        return obj
+    to_dict = getattr(obj, "to_dict_recursive", None) or getattr(obj, "to_dict", None)
+    return to_dict() if to_dict else dict(obj)
+
+
 def handle_webhook_event(event: stripe.Event) -> None:
     """Routes a verified Stripe event to the right handler. Unhandled
     event types are logged and ignored, not treated as errors — Stripe
@@ -127,17 +180,52 @@ def handle_webhook_event(event: stripe.Event) -> None:
     event_type = event["type"]
     logger.info("stripe webhook received type=%s id=%s", event_type, event["id"])
 
+    data_object = _as_dict(event["data"]["object"])
+
     if event_type in (
         "customer.subscription.created",
         "customer.subscription.updated",
     ):
-        _handle_subscription_upsert(event["data"]["object"])
+        _handle_subscription_upsert(data_object)
     elif event_type == "customer.subscription.deleted":
-        _handle_subscription_deleted(event["data"]["object"])
+        _handle_subscription_deleted(data_object)
     elif event_type == "invoice.payment_failed":
-        _handle_payment_failed(event["data"]["object"])
+        _handle_payment_failed(data_object)
+    elif event_type == "checkout.session.completed":
+        _handle_checkout_completed(data_object, event["id"])
     else:
         logger.info("stripe webhook type=%s not handled (no-op)", event_type)
+
+
+def _handle_checkout_completed(session: dict, event_id: str) -> None:
+    """Unlocks a ClearCheck report when its one-time payment completes.
+    Idempotent on the Stripe event ID (see clearcheck_store.mark_unlocked)
+    — Stripe redeliveries are recorded no-ops. Subscription checkouts
+    (no clearcheck metadata) are ignored here; they're driven by the
+    customer.subscription.* events instead."""
+    metadata = session.get("metadata") or {}
+    if metadata.get("purpose") != "clearcheck_unlock":
+        logger.info(
+            "checkout.session.completed session=%s is not a clearcheck "
+            "unlock (no-op)",
+            session.get("id"),
+        )
+        return
+    check_id = metadata.get("check_id")
+    if not check_id:
+        logger.error(
+            "clearcheck checkout session %s completed without a check_id "
+            "in metadata — cannot unlock anything",
+            session.get("id"),
+        )
+        return
+    outcome = clearcheck_store.mark_unlocked(check_id, event_id)
+    logger.info(
+        "clearcheck unlock outcome=%s check_id=%s event=%s",
+        outcome,
+        check_id,
+        event_id,
+    )
 
 
 def _tenant_id_from_subscription(subscription: dict) -> str | None:

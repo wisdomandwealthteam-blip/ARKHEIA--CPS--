@@ -17,9 +17,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from cps_backend.config import settings
-from cps_backend.routers import billing, health, risk
+from cps_backend.routers import billing, clearcheck, health, risk
 from cps_backend.schemas.common import ErrorResponse
 from cps_backend.utils.logging_setup import logger
+from cps_backend.utils.redaction import redact_validation_errors
 
 app = FastAPI(
     title=settings.app_name,
@@ -38,6 +39,7 @@ app.add_middleware(
 app.include_router(health.router)
 app.include_router(risk.router)
 app.include_router(billing.router)
+app.include_router(clearcheck.router)
 
 
 @app.middleware("http")
@@ -52,12 +54,15 @@ async def add_request_id(request: Request, call_next):
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     request_id = getattr(request.state, "request_id", None)
-    logger.warning("validation error request_id=%s detail=%s", request_id, exc.errors())
+    # Sensitive submitted values (VINs, emails, keys) are masked before
+    # the errors touch a log line or the response body.
+    errors = redact_validation_errors(exc.errors())
+    logger.warning("validation error request_id=%s detail=%s", request_id, errors)
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content=ErrorResponse(
             error="validation_error",
-            detail=str(exc.errors()),
+            detail=str(errors),
             request_id=request_id,
         ).model_dump(),
     )
