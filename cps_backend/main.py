@@ -24,7 +24,11 @@ from cps_backend.utils.redaction import redact_validation_errors
 
 app = FastAPI(
     title=settings.app_name,
-    description="Deterministic risk evaluation API for Auto and Housing contracts.",
+    description=(
+        "Deterministic risk evaluation API for Auto and Housing contracts. "
+        "Engine: ARKHEIA DVE™ | Architecture: PLATFORM-ARCHITECTURE-2026-V1 | "
+        "Active modules: dve-clearcheck, dve-riskcheck."
+    ),
     version="0.2.0",
 )
 

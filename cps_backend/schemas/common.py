@@ -21,6 +21,10 @@ class HealthResponse(BaseModel):
     app: str
     environment: str
     version: str
+    # Platform metadata (additive; defaults keep the schema backward compatible).
+    engine: str = "ARKHEIA DVE™"
+    architecture_version: str = "PLATFORM-ARCHITECTURE-2026-V1"
+    modules: list[str] = ["dve-clearcheck", "dve-riskcheck"]
 
 
 class AggregateRiskOut(BaseModel):
