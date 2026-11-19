@@ -1,0 +1,22 @@
+# Netlify configuration for the ClearCheck consumer frontend.
+#
+# The frontend is static (no build step) and lives in frontend/. It
+# resolves its API base at runtime (see frontend/config.js):
+#   - on localhost       -> http://localhost:8000
+#   - on the deployed site -> https://arkheia-cps-13.onrender.com
+#   - override anywhere via ?api=<url>
+#
+# IMPORTANT: the Render backend must list this site's origin (e.g.
+# https://<your-site>.netlify.app) in its CPS_ALLOWED_ORIGINS environment
+# variable, and CPS_FRONTEND_BASE_URL must point at this site so Stripe
+# checkout redirects land back on the ClearCheck page.
+
+[build]
+  publish = "frontend"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "no-referrer"

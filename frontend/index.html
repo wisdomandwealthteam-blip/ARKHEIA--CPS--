@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ClearCheck — ARKHEIA CPS</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <h1>ClearCheck</h1>
+      <p class="tagline">Deterministic consistency checks for your credit-report data.
+        Sensitive identifiers are masked before anything is stored or displayed.</p>
+      <p class="api-indicator">API: <code id="api-base"></code></p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div id="redirect-banner" class="banner hidden" role="status"></div>
+
+    <!-- ============ Step 1: enter check details ============ -->
+    <section class="card" id="form-card">
+      <h2><span class="step">1</span> Enter your check details</h2>
+      <p class="hint">Fields marked <span class="masked-tag">masked</span> are
+        redacted by the server — they never appear unmasked in any response,
+        log, or stored record. The previews below show exactly how each value
+        will appear.</p>
+
+      <form id="preview-form" novalidate>
+        <fieldset>
+          <legend>Consumer</legend>
+          <div class="grid">
+            <label>Full name <span class="masked-tag">masked</span>
+              <input type="text" id="consumer_name" required maxlength="128"
+                     autocomplete="name" placeholder="Jane Q. Consumer" />
+              <span class="mask-preview" data-mask-for="consumer_name"></span>
+            </label>
+            <label>Email (optional) <span class="masked-tag">masked</span>
+              <input type="email" id="consumer_email" maxlength="128"
+                     autocomplete="email" placeholder="jane@example.com" />
+              <span class="mask-preview" data-mask-for="consumer_email"></span>
+            </label>
+            <label>SSN last 4 (optional) <span class="masked-tag">masked</span>
+              <input type="text" id="ssn_last4" inputmode="numeric"
+                     pattern="\d{4}" maxlength="4" placeholder="1234" />
+              <span class="mask-preview" data-mask-for="ssn_last4"></span>
+            </label>
+            <label>Jurisdiction
+              <select id="jurisdiction">
+                <option value="US" selected>US — United States (federal)</option>
+                <option value="US-CA">US-CA — California</option>
+                <option value="US-NY">US-NY — New York</option>
+                <option value="__other__">Other…</option>
+              </select>
+              <input type="text" id="jurisdiction_other" class="hidden"
+                     maxlength="16" placeholder="e.g. US-TX" />
+            </label>
+            <label>Report date
+              <input type="date" id="report_date" required />
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Accounts / tradelines</legend>
+          <div id="accounts"></div>
+          <button type="button" class="btn secondary" id="add-account">+ Add another account</button>
+        </fieldset>
+
+        <div class="actions">
+          <button type="submit" class="btn primary" id="run-preview">Run free preview</button>
+          <span id="form-status" class="status" role="status"></span>
+        </div>
+      </form>
+    </section>
+
+    <!-- ============ Step 2: redacted preview ============ -->
+    <section class="card hidden" id="preview-card">
+      <h2><span class="step">2</span> Redacted preview</h2>
+      <div class="kv">
+        <div><span class="k">Check ID</span> <code id="p-check-id" class="check-id"></code>
+          <button type="button" class="btn tiny" id="copy-check-id">Copy</button></div>
+        <div><span class="k">Findings</span> <strong id="p-findings-count"></strong></div>
+        <div><span class="k">Jurisdiction</span> <span id="p-jurisdiction"></span></div>
+      </div>
+
+      <h3>Redacted summary</h3>
+      <ul id="p-summary" class="summary-list"></ul>
+
+      <h3>Jurisdiction context</h3>
+      <dl id="p-juris-meta" class="juris-meta"></dl>
+
+      <div class="notice" id="p-notice"></div>
+
+      <!-- lock state -->
+      <div id="lock-panel" class="lock-panel">
+        <div id="lock-locked" class="lock-state locked hidden">
+          <span class="lock-icon" aria-hidden="true">&#128274;</span>
+          <div>
+            <strong>Full report locked.</strong>
+            <p>The complete findings breakdown (rule codes, affected fields,
+              per-account detail) requires a one-time unlock payment.</p>
+            <label class="inline">Receipt email (optional)
+              <input type="email" id="checkout_email" placeholder="jane@example.com" />
+            </label>
+            <div class="actions">
+              <button type="button" class="btn primary" id="unlock-btn">Unlock full report</button>
+              <button type="button" class="btn secondary" id="check-report-btn">I already paid — retrieve report</button>
+            </div>
+          </div>
+        </div>
+        <div id="lock-unlocked" class="lock-state unlocked hidden">
+          <span class="lock-icon" aria-hidden="true">&#128275;</span>
+          <div>
+            <strong>Report unlocked.</strong>
+            <p>This check has already been paid for — you can retrieve the full report.</p>
+            <div class="actions">
+              <button type="button" class="btn primary" id="view-report-btn">View full report</button>
+            </div>
+          </div>
+        </div>
+        <span id="lock-status" class="status" role="status"></span>
+      </div>
+    </section>
+
+    <!-- ============ Step 3: full report ============ -->
+    <section class="card hidden" id="report-card">
+      <h2><span class="step">3</span> Full report</h2>
+      <div class="kv">
+        <div><span class="k">Check ID</span> <code id="r-check-id" class="check-id"></code></div>
+        <div><span class="k">Findings</span> <strong id="r-findings-count"></strong></div>
+        <div><span class="k">Jurisdiction</span> <span id="r-jurisdiction"></span></div>
+      </div>
+      <table class="findings" id="r-findings-table">
+        <thead>
+          <tr><th>Severity</th><th>Code</th><th>Account</th><th>Field</th><th>Description</th></tr>
+        </thead>
+        <tbody id="r-findings"></tbody>
+      </table>
+      <p id="r-no-findings" class="hidden">No inconsistencies were found in the submitted data.</p>
+      <h3>Jurisdiction context</h3>
+      <dl id="r-juris-meta" class="juris-meta"></dl>
+      <div class="notice" id="r-notice"></div>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <p>ARKHEIA CPS &middot; ClearCheck is informational only and is not legal advice.</p>
+  </footer>
+
+  <template id="account-template">
+    <div class="account" data-account>
+      <div class="account-head">
+        <h4>Account <span data-account-index></span></h4>
+        <button type="button" class="btn tiny danger" data-remove-account>Remove</button>
+      </div>
+      <div class="grid">
+        <label>Account number <span class="masked-tag">masked</span>
+          <input type="text" data-field="account_number" required maxlength="64"
+                 placeholder="ACCT-00123456" autocomplete="off" />
+          <span class="mask-preview" data-mask-field="account_number"></span>
+        </label>
+        <label>Creditor name
+          <input type="text" data-field="creditor_name" required maxlength="128"
+                 placeholder="Example Bank" />
+        </label>
+        <label>Status
+          <select data-field="status">
+            <option value="open" selected>Open</option>
+            <option value="closed">Closed</option>
+            <option value="paid">Paid</option>
+            <option value="charged_off">Charged off</option>
+            <option value="in_collection">In collection</option>
+            <option value="disputed">Disputed</option>
+          </select>
+        </label>
+        <label>Date opened
+          <input type="date" data-field="date_opened" required />
+        </label>
+        <label>Date closed (optional)
+          <input type="date" data-field="date_closed" />
+        </label>
+        <label>Last activity (optional)
+          <input type="date" data-field="date_of_last_activity" />
+        </label>
+        <label>Reported balance ($)
+          <input type="number" data-field="reported_balance" required min="0" step="0.01" value="0" />
+        </label>
+        <label>Past due ($)
+          <input type="number" data-field="reported_past_due" min="0" step="0.01" value="0" />
+        </label>
+        <label>Credit limit ($, optional)
+          <input type="number" data-field="credit_limit" min="0" step="0.01" />
+        </label>
+      </div>
+    </div>
+  </template>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
