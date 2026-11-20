@@ -15,7 +15,7 @@ services:
     # deploys and restarts. Both JSON stores below live on this mount.
     disk:
       name: arkheia-cps-data
-      mountPath: /var/data
+      mountPath: /opt/render/project/src/data
       sizeGB: 1
 
     envVars:
@@ -46,6 +46,6 @@ services:
       - key: CPS_FRONTEND_BASE_URL
         sync: false
       - key: CPS_BILLING_STORE_PATH
-        value: /var/data/subscriptions.json
+        value: /opt/render/project/src/data/subscriptions.json
       - key: CPS_CLEARCHECK_STORE_PATH
-        value: /var/data/clearcheck_checks.json
+        value: /opt/render/project/src/data/clearcheck_checks.json
