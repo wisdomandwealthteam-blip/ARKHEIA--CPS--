@@ -96,7 +96,7 @@ class Settings:
     # Where Stripe Checkout / the Customer Portal should redirect back to.
     frontend_base_url: str = os.environ.get(
         "CPS_FRONTEND_BASE_URL", "http://localhost:5173"
-    )
+    ).strip()
 
     # Where subscription records are persisted. A JSON file is used here
     # deliberately — see services/billing_store.py for why, and for the

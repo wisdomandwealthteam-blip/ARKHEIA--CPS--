@@ -269,7 +269,7 @@ def test_callback_urls_encode_both_frontend_contracts_and_preserve_path(monkeypa
 
 @pytest.mark.parametrize("url", [
     "http://localhost:5173", "https://frontend.example", "https://frontend.example/app/",
-    "https://[::1]:8443/app",
+    "https://[::1]:8443/app", "https://fairnes.netlify.app", "Https://fairnes.netlify.app",
 ])
 def test_valid_frontend_urls_are_accepted(url, monkeypatch):
     captured = fake_session(monkeypatch)
