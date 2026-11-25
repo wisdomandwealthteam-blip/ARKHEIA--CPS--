@@ -4,7 +4,7 @@ cps_backend.schemas.billing
 """
 from __future__ import annotations
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from cps_backend.services.tiers import Tier
 
@@ -32,4 +32,20 @@ class SubscriptionStatusResponse(BaseModel):
     monthly_price_usd: float | None
     current_period_end: str | None
     has_stripe_customer: bool
-  
+
+
+class TrialStatusResponse(BaseModel):
+    trial_active: bool
+    trial_expires_at: int | None
+
+
+class TrialPortalRequest(BaseModel):
+    session_id: str = Field(
+        strict=True, min_length=24, max_length=255,
+        pattern=r"^cs_(?:test|live)_[A-Za-z0-9]{16,}$",
+    )
+
+
+class TrialPortalResponse(BaseModel):
+    url: str
+    portal_url: str

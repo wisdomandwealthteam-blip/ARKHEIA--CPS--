@@ -17,7 +17,7 @@ from cps_backend.schemas.billing import (
 )
 from cps_backend.services import clearcheck_store
 from cps_backend.services.auth import ApiKeyContext, get_api_key_context
-from cps_backend.services.billing_store import get_subscription
+from cps_backend.services.billing_store import BillingStoreError, get_subscription
 from cps_backend.services.stripe_service import (
     ClearCheckUnknownCheckError,
     StripeNotConfiguredError,
@@ -127,7 +127,7 @@ async def stripe_webhook(request: Request) -> dict:
 
     try:
         handle_webhook_event(event)
-    except (ClearCheckUnknownCheckError, clearcheck_store.ClearCheckStoreError):
+    except (ClearCheckUnknownCheckError, clearcheck_store.ClearCheckStoreError, BillingStoreError):
         logger.warning("clearcheck webhook processing temporarily unavailable")
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,

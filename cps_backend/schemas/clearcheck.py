@@ -12,9 +12,9 @@ from __future__ import annotations
 
 from datetime import date
 from enum import Enum
-from typing import Any
+from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class AccountStatus(str, Enum):
@@ -83,7 +83,18 @@ class ClearCheckReportResponse(BaseModel):
 class ClearCheckCheckoutRequest(BaseModel):
     check_id: str = Field(strict=True)
     customer_email: str | None = None
+    plan: Literal["single_report", "trial_7d"] = "single_report"
+
+    @model_validator(mode="before")
+    @classmethod
+    def require_single_report_check(cls, data: Any) -> Any:
+        # The trial CTA does not need a preview. Legacy report requests
+        # must still include their check_id; blank IDs retain the route's 400.
+        if isinstance(data, dict) and data.get("plan") == "trial_7d" and "check_id" not in data:
+            return {**data, "check_id": ""}
+        return data
 
 
 class ClearCheckCheckoutResponse(BaseModel):
     checkout_url: str
+    url: str | None = None

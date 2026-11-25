@@ -13,7 +13,9 @@ functions will work against real Stripe — see docs/BILLING.md.
 from __future__ import annotations
 
 import ipaddress
+import os
 import re
+from datetime import datetime, timezone
 from typing import Any
 from urllib.parse import urlencode, urlsplit, urlunsplit
 
@@ -21,7 +23,13 @@ import stripe
 
 from cps_backend.config import settings
 from cps_backend.services import clearcheck_store
-from cps_backend.services.billing_store import SubscriptionRecord, upsert_subscription
+from cps_backend.services.billing_store import (
+    SubscriptionRecord,
+    get_trial,
+    record_paid_trial,
+    revoke_trial_subscription,
+    upsert_subscription,
+)
 from cps_backend.services.tiers import Tier
 from cps_backend.utils.logging_setup import logger
 from cps_backend.utils.redaction import mask_email
@@ -51,6 +59,10 @@ class StripeCheckoutInvalidSessionError(Exception):
 
 class ClearCheckUnknownCheckError(Exception):
     """A paid webhook refers to a check not currently in the store."""
+
+
+class ClearCheckNoRecurringSubscriptionError(Exception):
+    """The $1 payment fallback has no subscription or renewal to cancel."""
 
 
 def _require_configured() -> None:
@@ -219,6 +231,59 @@ def create_clearcheck_checkout_session(
     return checkout_url
 
 
+def create_clearcheck_trial_checkout_session(customer_email: str | None = None) -> str:
+    """Charge $1 now and, when configured, start a seven-day subscription trial.
+
+    Price IDs are runtime environment variables so this addition does not
+    require changing the shared application's settings or legacy tier prices.
+    The configured setup Price must be a $1 USD one-time Price; the monthly
+    Price must be recurring. Missing either falls back to a $1 payment only.
+    """
+    _require_configured()
+    setup_price = os.environ.get("STRIPE_TRIAL_SETUP_PRICE_ID", "").strip()
+    monthly_price = os.environ.get("STRIPE_MONTHLY_PRICE_ID", "").strip()
+    metadata = {"plan": "trial_7d", "product": "clearcheck_gate"}
+    params: dict[str, Any] = {
+        "success_url": "https://ericscott.ai/?trial=active&session_id={CHECKOUT_SESSION_ID}",
+        "cancel_url": "https://ericscott.ai/?trial=canceled",
+        "customer_email": customer_email,
+        "metadata": metadata,
+    }
+    if setup_price and monthly_price:
+        params.update(
+            mode="subscription",
+            line_items=[
+                {"price": setup_price, "quantity": 1},
+                {"price": monthly_price, "quantity": 1},
+            ],
+            subscription_data={"trial_period_days": 7, "metadata": dict(metadata)},
+        )
+    else:
+        params.update(
+            mode="payment",
+            customer_creation="always",
+            line_items=[{
+                "price_data": {
+                    "currency": "usd",
+                    "unit_amount": 100,
+                    "product_data": {"name": "ClearCheck seven-day trial setup"},
+                },
+                "quantity": 1,
+            }],
+        )
+    session = stripe.checkout.Session.create(**params)
+    checkout_url = getattr(session, "url", None)
+    try:
+        _validated_url(checkout_url, schemes={"https"})
+    except ValueError:
+        raise StripeCheckoutInvalidSessionError(
+            "Stripe returned an invalid checkout session."
+        ) from None
+    # Session IDs are bearer credentials for trial access: never log them.
+    logger.info("clearcheck trial checkout session created")
+    return checkout_url
+
+
 def create_portal_session(stripe_customer_id: str) -> str:
     """Creates a Stripe Customer Portal session so the user can manage
     their existing subscription (update card, cancel, view invoices)
@@ -230,6 +295,31 @@ def create_portal_session(stripe_customer_id: str) -> str:
         return_url=f"{settings.frontend_base_url}/?tab=billing",
     )
     return session.url
+
+
+def create_clearcheck_trial_portal_session(session_id: str) -> str | None:
+    """Only the signed-webhook record, never the request, selects a customer.
+
+    A paid customer's portal remains available after trial expiry/cancellation
+    so they can manage any subsequent billing. Unknown sessions fail closed.
+    """
+    record = get_trial(session_id)
+    if record is None:
+        return None
+    if not record.stripe_subscription_id:
+        raise ClearCheckNoRecurringSubscriptionError(
+            "This trial was a one-time $1 payment. There is no recurring "
+            "subscription or automatic renewal to cancel; access expires "
+            "after seven days."
+        )
+    portal_url = create_portal_session(record.stripe_customer_id)
+    try:
+        _validated_url(portal_url, schemes={"https"})
+    except ValueError:
+        raise StripeCheckoutInvalidSessionError(
+            "Stripe returned an invalid portal session."
+        ) from None
+    return portal_url
 
 
 def construct_webhook_event(payload: bytes, sig_header: str | None) -> stripe.Event:
@@ -293,20 +383,74 @@ def handle_webhook_event(event: stripe.Event) -> None:
         "checkout.session.completed",
         "checkout.session.async_payment_succeeded",
     ):
-        _handle_checkout_completed(data_object, event["id"])
+        _handle_checkout_completed(data_object, event["id"], _as_dict(event).get("created"))
     elif event_type == "checkout.session.async_payment_failed":
         logger.info("checkout asynchronous payment failed; no unlock performed")
     else:
         logger.info("stripe webhook event not handled (no-op)")
 
 
-def _handle_checkout_completed(session: dict, event_id: str) -> None:
+def _is_clearcheck_trial(metadata: Any) -> bool:
+    return (
+        isinstance(metadata, dict)
+        and metadata.get("plan") == "trial_7d"
+        and metadata.get("product") == "clearcheck_gate"
+    )
+
+
+def _handle_paid_trial(session: dict, completed_at: Any) -> None:
+    # Subscription trials normally use no_payment_required. Ours deliberately
+    # requires a paid $1 setup invoice; metadata alone cannot grant access.
+    if (
+        session.get("mode") not in {"payment", "subscription"}
+        or session.get("payment_status") != "paid"
+        or type(session.get("amount_total")) is not int
+        or session["amount_total"] != 100
+        or session.get("currency") != "usd"
+    ):
+        logger.info("clearcheck trial checkout is not a paid $1 checkout (no-op)")
+        return
+    session_id = session.get("id")
+    customer_id = session.get("customer")
+    subscription_id = session.get("subscription")
+    if (
+        not isinstance(session_id, str)
+        or not re.fullmatch(r"cs_(?:test|live)_[A-Za-z0-9]{16,}", session_id)
+        or len(session_id) > 255
+        or not isinstance(customer_id, str)
+        or not customer_id.startswith("cus_")
+        or (session.get("mode") == "subscription" and (
+            not isinstance(subscription_id, str) or not subscription_id.startswith("sub_")
+        ))
+    ):
+        logger.warning("clearcheck trial checkout lacks required identifiers (no-op)")
+        return
+    # Anchor to the signed successful event's timestamp, not webhook delivery.
+    # Old deliveries cannot manufacture another seven days. Missing timestamps
+    # in SDK/test fixtures use session creation, then now; replay is still a no-op.
+    timestamp = completed_at if type(completed_at) is int else session.get("created")
+    now = int(datetime.now(timezone.utc).timestamp())
+    if type(timestamp) is not int or timestamp <= 0:
+        timestamp = now
+    expires_at = min(timestamp, now) + 7 * 24 * 60 * 60
+    record_paid_trial(
+        session_id, customer_id,
+        subscription_id if session.get("mode") == "subscription" else None,
+        expires_at,
+    )
+    logger.info("clearcheck paid trial processed")
+
+
+def _handle_checkout_completed(session: dict, event_id: str, completed_at: Any = None) -> None:
     """Unlocks a ClearCheck report when its one-time payment completes.
     Idempotent on the Stripe event ID (see clearcheck_store.mark_unlocked)
-    — Stripe redeliveries are recorded no-ops. Subscription checkouts
-    (no clearcheck metadata) are ignored here; they're driven by the
-    customer.subscription.* events instead."""
+    — Stripe redeliveries are recorded no-ops. Trial checkouts get a separate
+    finite entitlement, never a permanent single-report unlock. Other
+    subscriptions are driven by customer.subscription.* events instead."""
     metadata = session.get("metadata") or {}
+    if _is_clearcheck_trial(metadata):
+        _handle_paid_trial(session, completed_at)
+        return
     if metadata.get("purpose") != "clearcheck_unlock":
         logger.info("checkout session is not a clearcheck unlock (no-op)")
         return
@@ -356,6 +500,14 @@ def _tier_from_subscription(subscription: dict) -> Tier:
 
 
 def _handle_subscription_upsert(subscription: dict) -> None:
+    if _is_clearcheck_trial(subscription.get("metadata")):
+        # Created/updated alone never grants access without the paid checkout.
+        # Nor can a later trialing/active update revive a revoked entitlement.
+        if subscription.get("status") in {"canceled", "incomplete_expired", "unpaid", "past_due"}:
+            subscription_id = subscription.get("id")
+            if isinstance(subscription_id, str) and subscription_id:
+                revoke_trial_subscription(subscription_id)
+        return
     tenant_id = _tenant_id_from_subscription(subscription)
     if not tenant_id:
         return
@@ -379,6 +531,11 @@ def _handle_subscription_upsert(subscription: dict) -> None:
 
 
 def _handle_subscription_deleted(subscription: dict) -> None:
+    if _is_clearcheck_trial(subscription.get("metadata")):
+        subscription_id = subscription.get("id")
+        if isinstance(subscription_id, str) and subscription_id:
+            revoke_trial_subscription(subscription_id)
+        return
     tenant_id = _tenant_id_from_subscription(subscription)
     if not tenant_id:
         return

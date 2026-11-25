@@ -23,7 +23,9 @@ from __future__ import annotations
 
 import json
 import os
+import sqlite3
 import threading
+from contextlib import contextmanager
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 
@@ -144,3 +146,98 @@ def effective_tier(tenant_id: str) -> Tier:
             tenant_id,
         )
         return Tier.FREE
+
+
+class BillingStoreError(Exception):
+    """Trial persistence is unavailable; callers must fail closed."""
+
+
+@dataclass(frozen=True)
+class TrialRecord:
+    session_id: str
+    stripe_customer_id: str
+    stripe_subscription_id: str | None
+    status: str
+    trial_expires_at: int
+
+    def is_active(self) -> bool:
+        return (
+            self.status == "trial_active"
+            and datetime.now(timezone.utc).timestamp() < self.trial_expires_at
+        )
+
+
+@contextmanager
+def _trial_db():
+    # Keep trial records separate from legacy tenant JSON. SQLite transactions
+    # also protect session idempotency and cancellation across worker processes.
+    connection = None
+    try:
+        path = f"{settings.billing_store_path}.trials.sqlite3"
+        os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+        connection = sqlite3.connect(path, timeout=5)
+        os.chmod(path, 0o600)
+        connection.row_factory = sqlite3.Row
+        with connection:
+            connection.execute("""
+                CREATE TABLE IF NOT EXISTS trials (
+                    session_id TEXT PRIMARY KEY,
+                    stripe_customer_id TEXT NOT NULL,
+                    stripe_subscription_id TEXT,
+                    status TEXT NOT NULL,
+                    trial_expires_at INTEGER NOT NULL
+                )
+            """)
+            connection.execute("""
+                CREATE TABLE IF NOT EXISTS revoked_trial_subscriptions (
+                    subscription_id TEXT PRIMARY KEY
+                )
+            """)
+            yield connection
+    except (OSError, sqlite3.Error):
+        raise BillingStoreError("Trial records are temporarily unavailable.") from None
+    finally:
+        if connection is not None:
+            connection.close()
+
+
+def get_trial(session_id: str) -> TrialRecord | None:
+    with _trial_db() as db:
+        row = db.execute("SELECT * FROM trials WHERE session_id = ?", (session_id,)).fetchone()
+        return TrialRecord(**dict(row)) if row is not None else None
+
+
+def record_paid_trial(
+    session_id: str,
+    stripe_customer_id: str,
+    stripe_subscription_id: str | None,
+    trial_expires_at: int,
+) -> None:
+    with _trial_db() as db:
+        # Reserve the write lock before reading revocations so a simultaneous
+        # cancellation cannot race the paid checkout into reactivation.
+        db.execute("BEGIN IMMEDIATE")
+        revoked = stripe_subscription_id and db.execute(
+            "SELECT 1 FROM revoked_trial_subscriptions WHERE subscription_id = ?",
+            (stripe_subscription_id,),
+        ).fetchone()
+        db.execute(
+            "INSERT OR IGNORE INTO trials VALUES (?, ?, ?, ?, ?)",
+            (session_id, stripe_customer_id, stripe_subscription_id,
+             "canceled" if revoked else "trial_active", trial_expires_at),
+        )
+        # INSERT OR IGNORE means replayed events cannot extend seven days or
+        # overwrite a cancellation. Only a different, paid session is a new trial.
+
+
+def revoke_trial_subscription(subscription_id: str) -> None:
+    with _trial_db() as db:
+        db.execute("BEGIN IMMEDIATE")
+        db.execute(
+            "INSERT OR IGNORE INTO revoked_trial_subscriptions VALUES (?)",
+            (subscription_id,),
+        )
+        db.execute(
+            "UPDATE trials SET status = 'canceled' WHERE stripe_subscription_id = ?",
+            (subscription_id,),
+        )
