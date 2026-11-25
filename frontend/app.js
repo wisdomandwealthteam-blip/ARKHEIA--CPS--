@@ -18,6 +18,25 @@
   var CHECK_ID_KEY = "arkheia_last_check_id";
 
   var state = { checkId: null, unlockRequired: true };
+  var reportRequestVersion = 0;
+
+  // IDs are opaque backend keys. Check for blankness, but never normalize them.
+  function validCheckId(id) {
+    // Match Python str.strip(), whose Unicode whitespace differs from JS trim.
+    return typeof id === "string" &&
+      /[^\u0009-\u000d\u001c-\u0020\u0085\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]/.test(id);
+  }
+
+  function savedCheckId() {
+    try { return localStorage.getItem(CHECK_ID_KEY); } catch (e) { return null; }
+  }
+
+  function saveCheckId(id) {
+    try {
+      localStorage.setItem(CHECK_ID_KEY, id);
+      return localStorage.getItem(CHECK_ID_KEY) === id;
+    } catch (e) { return false; }
+  }
 
   // ---------------------------------------------------------------
   // Masking mirrors of cps_backend/utils/redaction.py
@@ -142,12 +161,7 @@
   }
 
   function errorDetail(result, fallback) {
-    if (result.body) {
-      if (typeof result.body.detail === "string") return result.body.detail;
-      if (typeof result.body.error === "string") {
-        return result.body.error + (result.body.detail ? ": " + result.body.detail : "");
-      }
-    }
+    // A response may echo submitted identifiers or provider details.
     return fallback + " (HTTP " + result.status + ")";
   }
 
@@ -179,8 +193,16 @@
   }
 
   function renderPreview(data) {
+    reportRequestVersion++;
     state.checkId = data.check_id;
-    try { localStorage.setItem(CHECK_ID_KEY, data.check_id); } catch (e) { /* ignore */ }
+    var saved = saveCheckId(data.check_id);
+    // Do not leave an old URL recovery reference pointing at a different check.
+    var url = new URL(window.location.href);
+    if (url.searchParams.has("check_id")) {
+      if (saved) url.searchParams.delete("check_id");
+      else url.searchParams.set("check_id", data.check_id);
+      window.history.replaceState({}, "", url.toString());
+    }
 
     $("p-check-id").textContent = data.check_id;
     $("p-findings-count").textContent = String(data.findings_count);
@@ -203,12 +225,21 @@
 
     renderJurisMeta($("p-juris-meta"), data.jurisdiction_metadata);
     $("p-notice").textContent = data.notice;
-    renderLockState(data.unlock_required);
+    show($("preview-details"));
+    hide($("retry-report-btn"));
+    // A report response, not a preview or return URL, verifies an unlock.
+    if (data.unlock_required) renderLockState(true);
+    else {
+      hide($("lock-locked"));
+      hide($("lock-unlocked"));
+    }
     setStatus($("lock-status"), "");
 
     hide($("report-card"));
+    hide($("redirect-banner"));
     show($("preview-card"));
     $("preview-card").scrollIntoView({ behavior: "smooth", block: "start" });
+    if (!data.unlock_required) fetchReport(data.check_id);
   }
 
   function renderReport(data) {
@@ -300,11 +331,29 @@
   }
 
   function fetchReport(checkId) {
+    var requestVersion = ++reportRequestVersion;
     var status = $("lock-status");
+    hide($("retry-report-btn"));
+    hide($("lock-locked"));
+    hide($("lock-unlocked"));
+    hide($("report-card"));
     setStatus(status, "Retrieving report…", "busy");
-    return apiFetch("/api/clearcheck/report/" + encodeURIComponent(checkId), {
+    var path;
+    try {
+      // Browsers normalize literal or encoded dot segments before sending.
+      // Encoding the separator retains '.' and '..' as opaque backend IDs.
+      path = "/api/clearcheck/report" +
+        (checkId === "." || checkId === ".." ? "%2F" : "/") +
+        encodeURIComponent(checkId);
+    } catch (e) {
+      setStatus(status, "Could not encode the report reference.", "error");
+      show($("retry-report-btn"));
+      return Promise.resolve();
+    }
+    return apiFetch(path, {
       method: "GET",
     }).then(function (result) {
+      if (requestVersion !== reportRequestVersion || checkId !== state.checkId) return;
       if (result.status === 402) {
         renderLockState(true);
         setStatus(
@@ -323,25 +372,35 @@
           "the backend store was reset).",
           "error"
         );
+        show($("retry-report-btn"));
         return;
       }
       if (!result.ok) {
-        throw new Error(errorDetail(result, "Report retrieval failed"));
+        throw new Error("Report retrieval failed (HTTP " + result.status + ").");
+      }
+      if (!result.body || result.body.unlocked !== true ||
+          result.body.check_id !== checkId || !Array.isArray(result.body.findings) ||
+          !result.body.jurisdiction_metadata ||
+          typeof result.body.jurisdiction_metadata !== "object") {
+        throw new Error("Could not verify the report. Please try again.");
       }
       setStatus(status, "", "");
       renderReport(result.body);
     }).catch(function (err) {
+      if (requestVersion !== reportRequestVersion || checkId !== state.checkId) return;
       setStatus(status, err.message, "error");
+      show($("retry-report-btn"));
     });
   }
 
   function startCheckout() {
     if (!state.checkId) return;
+    var checkoutId = state.checkId;
     var status = $("lock-status");
     setStatus(status, "Creating secure checkout…", "busy");
     $("unlock-btn").disabled = true;
 
-    var payload = { check_id: state.checkId };
+    var payload = { check_id: checkoutId };
     var email = $("checkout_email").value.trim();
     if (email) payload.customer_email = email;
 
@@ -351,17 +410,21 @@
       body: JSON.stringify(payload),
     })
       .then(function (result) {
-        if (result.status === 400) {
-          // Already unlocked — flip state and fetch directly.
-          renderLockState(false);
-          setStatus(status, "This check is already unlocked.", "ok");
-          return fetchReport(state.checkId);
+        if (state.checkId !== checkoutId) return;
+        if (result.status === 400 && result.body &&
+            result.body.error === "check_already_unlocked") {
+          // Confirm the current state through the report endpoint.
+          return fetchReport(checkoutId);
         }
         if (result.status === 503) {
-          throw new Error(
-            "Payments are not available right now (Stripe is not configured " +
-            "on this backend)."
-          );
+          throw new Error("Checkout is temporarily unavailable. Please try again later.");
+        }
+        if (result.status === 400) {
+          // Do not echo arbitrary server details that might contain submitted data.
+          var code = result.body && result.body.error;
+          throw new Error(code === "invalid_checkout_request"
+            ? "Invalid checkout request (invalid_checkout_request)."
+            : "Checkout failed (HTTP 400).");
         }
         if (!result.ok) {
           throw new Error(errorDetail(result, "Checkout failed"));
@@ -370,6 +433,7 @@
         window.location.assign(result.body.checkout_url);
       })
       .catch(function (err) {
+        if (state.checkId !== checkoutId) return;
         setStatus(status, err.message, "error");
       })
       .then(function () {
@@ -378,36 +442,65 @@
   }
 
   // ---------------------------------------------------------------
-  // Stripe redirect handling (?clearcheck=success|cancelled)
+  // Stripe redirect handling (legacy clearcheck and React-compatible params)
   // ---------------------------------------------------------------
   function handleRedirectParams() {
     var params = new URLSearchParams(window.location.search);
-    var outcome = params.get("clearcheck");
-    if (!outcome) return;
-
+    var legacyOutcome = params.get("clearcheck");
+    var checkoutOutcome = params.get("checkout");
+    var outcome = legacyOutcome === "success" || legacyOutcome === "cancelled"
+      ? legacyOutcome
+      : !legacyOutcome && params.has("check_id") &&
+          (checkoutOutcome === "success" || checkoutOutcome === "cancelled")
+        ? checkoutOutcome : null;
     var banner = $("redirect-banner");
-    var storedCheckId = null;
-    try { storedCheckId = localStorage.getItem(CHECK_ID_KEY); } catch (e) { /* ignore */ }
+    var checkIds = params.getAll("check_id");
+    var checkId = null;
+    if (checkIds.length === 1) {
+      checkId = checkIds[0];
+    } else if (checkIds.length === 0) {
+      // Existing legacy links and ordinary reloads recover from storage.
+      checkId = savedCheckId();
+    }
+    // A duplicated or blank URL reference must not fall back to another check.
+    if (!validCheckId(checkId)) checkId = null;
 
-    if (outcome === "success" && storedCheckId) {
-      banner.textContent =
-        "Payment received — retrieving your unlocked report…";
-      banner.classList.add("ok");
-      show(banner);
-      state.checkId = storedCheckId;
-      $("p-check-id").textContent = storedCheckId;
+    if (checkId) {
+      if (outcome) {
+        banner.textContent = outcome === "success"
+          ? "Returned from checkout. Checking your report status…"
+          : "Checkout was cancelled. Checking your report status…";
+        show(banner);
+      }
+      state.checkId = checkId;
+      $("p-check-id").textContent = checkId;
+      hide($("preview-details"));
       show($("preview-card"));
-      fetchReport(storedCheckId);
-    } else if (outcome === "cancelled") {
-      banner.textContent =
-        "Checkout was cancelled — your preview is unchanged and nothing was charged.";
+      fetchReport(checkId);
+    } else if (outcome || checkIds.length) {
+      banner.textContent = (outcome === "success"
+        ? "Returned from checkout. " : outcome === "cancelled"
+          ? "Checkout was cancelled. " : "") +
+        "Run your preview again to check your report status.";
       banner.classList.add("warn");
       show(banner);
     }
-    // Clean the query string so refreshes don't re-trigger the banner.
+
+    // Keep exactly one URL reference if storage cannot preserve it for reload.
+    // Remove only return parameters and check_id; preserve unrelated parameters.
+    var saved = checkId ? saveCheckId(checkId) : false;
     var url = new URL(window.location.href);
-    url.searchParams.delete("clearcheck");
-    window.history.replaceState({}, "", url.toString());
+    if (legacyOutcome === "success" || legacyOutcome === "cancelled") {
+      url.searchParams.delete("clearcheck");
+    }
+    if (outcome && checkoutOutcome === outcome) url.searchParams.delete("checkout");
+    if (checkIds.length && (!checkId || saved)) url.searchParams.delete("check_id");
+    if (outcome && checkId && !saved && !checkIds.length) {
+      url.searchParams.set("check_id", checkId);
+    }
+    if (url.toString() !== window.location.href) {
+      window.history.replaceState({}, "", url.toString());
+    }
   }
 
   // ---------------------------------------------------------------
@@ -436,6 +529,9 @@
       if (state.checkId) fetchReport(state.checkId);
     });
     $("view-report-btn").addEventListener("click", function () {
+      if (state.checkId) fetchReport(state.checkId);
+    });
+    $("retry-report-btn").addEventListener("click", function () {
       if (state.checkId) fetchReport(state.checkId);
     });
     $("copy-check-id").addEventListener("click", function () {

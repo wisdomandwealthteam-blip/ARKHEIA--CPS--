@@ -81,17 +81,19 @@
       <div class="kv">
         <div><span class="k">Check ID</span> <code id="p-check-id" class="check-id"></code>
           <button type="button" class="btn tiny" id="copy-check-id">Copy</button></div>
-        <div><span class="k">Findings</span> <strong id="p-findings-count"></strong></div>
-        <div><span class="k">Jurisdiction</span> <span id="p-jurisdiction"></span></div>
       </div>
 
-      <h3>Redacted summary</h3>
-      <ul id="p-summary" class="summary-list"></ul>
-
-      <h3>Jurisdiction context</h3>
-      <dl id="p-juris-meta" class="juris-meta"></dl>
-
-      <div class="notice" id="p-notice"></div>
+      <div id="preview-details">
+        <div class="kv">
+          <div><span class="k">Findings</span> <strong id="p-findings-count"></strong></div>
+          <div><span class="k">Jurisdiction</span> <span id="p-jurisdiction"></span></div>
+        </div>
+        <h3>Redacted summary</h3>
+        <ul id="p-summary" class="summary-list"></ul>
+        <h3>Jurisdiction context</h3>
+        <dl id="p-juris-meta" class="juris-meta"></dl>
+        <div class="notice" id="p-notice"></div>
+      </div>
 
       <!-- lock state -->
       <div id="lock-panel" class="lock-panel">
@@ -121,6 +123,9 @@
           </div>
         </div>
         <span id="lock-status" class="status" role="status"></span>
+        <div class="actions">
+          <button type="button" class="btn secondary hidden" id="retry-report-btn">Retry retrieving report</button>
+        </div>
       </div>
     </section>
 

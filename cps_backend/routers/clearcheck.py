@@ -19,7 +19,10 @@ only, so even the paid report cannot leak what was submitted.
 """
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException, status
+import stripe
+
+from fastapi import APIRouter, HTTPException, Request, status
+from fastapi.responses import JSONResponse
 
 from cps_backend.schemas.clearcheck import (
     ClearCheckCheckoutRequest,
@@ -38,6 +41,8 @@ from cps_backend.services.clearcheck_engine import (
     run_checks,
 )
 from cps_backend.services.stripe_service import (
+    StripeCheckoutConfigurationError,
+    StripeCheckoutInvalidSessionError,
     StripeNotConfiguredError,
     create_clearcheck_checkout_session,
 )
@@ -86,7 +91,7 @@ def clearcheck_preview(body: ClearCheckPreviewRequest) -> ClearCheckPreviewRespo
     )
 
 
-@router.get("/report/{check_id}", response_model=ClearCheckReportResponse)
+@router.get("/report/{check_id:path}", response_model=ClearCheckReportResponse)
 def clearcheck_report(check_id: str) -> ClearCheckReportResponse:
     record = clearcheck_store.get_check(check_id)
     if record is None:
@@ -116,26 +121,87 @@ def clearcheck_report(check_id: str) -> ClearCheckReportResponse:
 
 @router.post("/checkout", response_model=ClearCheckCheckoutResponse)
 def clearcheck_checkout(
+    request: Request,
     body: ClearCheckCheckoutRequest,
-) -> ClearCheckCheckoutResponse:
-    record = clearcheck_store.get_check(body.check_id)
+) -> ClearCheckCheckoutResponse | JSONResponse:
+    def error_response(status_code: int, error: str, detail: str) -> JSONResponse:
+        logger.warning(
+            "clearcheck checkout request_id=%s error_code=%s",
+            request.state.request_id,
+            error,
+        )
+        return JSONResponse(
+            status_code=status_code,
+            content={"error": error, "detail": detail, "request_id": request.state.request_id},
+        )
+
+    # Do not normalize nonblank IDs: legacy IDs remain valid lookup keys.
+    if not body.check_id.strip():
+        return error_response(
+            status.HTTP_400_BAD_REQUEST,
+            "invalid_checkout_request",
+            "A non-empty check_id is required.",
+        )
+
+    try:
+        record = clearcheck_store.get_check(body.check_id)
+    except clearcheck_store.ClearCheckStoreCorruptError:
+        return error_response(
+            status.HTTP_503_SERVICE_UNAVAILABLE,
+            "check_store_corrupt",
+            "Check records are temporarily unavailable.",
+        )
+    except clearcheck_store.ClearCheckStoreError:
+        return error_response(
+            status.HTTP_503_SERVICE_UNAVAILABLE,
+            "check_store_unavailable",
+            "Check records are temporarily unavailable.",
+        )
+
     if record is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Unknown check_id. Run POST /api/clearcheck/preview first.",
+        return error_response(
+            status.HTTP_404_NOT_FOUND,
+            "check_not_found",
+            "Unknown check_id. Run POST /api/clearcheck/preview first.",
         )
     if record.get("unlocked"):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="This check is already unlocked — fetch the report directly.",
+        return error_response(
+            status.HTTP_400_BAD_REQUEST,
+            "check_already_unlocked",
+            "This check is already unlocked — fetch the report directly.",
         )
     try:
         url = create_clearcheck_checkout_session(
             check_id=body.check_id,
             customer_email=body.customer_email,
         )
-    except StripeNotConfiguredError as e:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e)
+    except StripeNotConfiguredError:
+        return error_response(
+            status.HTTP_503_SERVICE_UNAVAILABLE,
+            "stripe_not_configured",
+            "Checkout is not configured.",
+        )
+    except StripeCheckoutConfigurationError:
+        return error_response(
+            status.HTTP_503_SERVICE_UNAVAILABLE,
+            "checkout_config_invalid",
+            "Checkout is temporarily unavailable due to a configuration issue.",
+        )
+    except StripeCheckoutInvalidSessionError:
+        return error_response(
+            status.HTTP_502_BAD_GATEWAY,
+            "stripe_invalid_session",
+            "The payment provider returned an invalid checkout session.",
+        )
+    except stripe.StripeError as exc:
+        logger.warning(
+            "clearcheck checkout request_id=%s stripe_error_class=%s",
+            request.state.request_id,
+            type(exc).__name__,
+        )
+        return error_response(
+            status.HTTP_502_BAD_GATEWAY,
+            "stripe_upstream_error",
+            "The payment provider is temporarily unavailable.",
         )
     return ClearCheckCheckoutResponse(checkout_url=url)

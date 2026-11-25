@@ -117,6 +117,8 @@ def _checkout_completed_event(check_id: str, event_id: str = "evt_test_1") -> by
                 "object": {
                     "id": "cs_test_1",
                     "object": "checkout.session",
+                    "mode": "payment",
+                    "payment_status": "paid",
                     "metadata": {
                         "purpose": "clearcheck_unlock",
                         "check_id": check_id,
@@ -324,9 +326,9 @@ def test_duplicate_event_does_not_relock_or_mutate_record(stripe_configured):
     assert before == after
 
 
-def test_webhook_for_unknown_check_is_acknowledged_but_noop(stripe_configured):
+def test_webhook_for_unknown_check_is_retryable(stripe_configured):
     resp = _unlock_via_webhook("chk_never_created", event_id="evt_orphan")
-    assert resp.status_code == 200
+    assert resp.status_code == 503
     # the event was NOT burned — a later redelivery after the check
     # exists could still succeed
     assert not clearcheck_store.was_event_processed("evt_orphan")

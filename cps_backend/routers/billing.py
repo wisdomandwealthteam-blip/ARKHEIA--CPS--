@@ -15,9 +15,11 @@ from cps_backend.schemas.billing import (
     PortalSessionResponse,
     SubscriptionStatusResponse,
 )
+from cps_backend.services import clearcheck_store
 from cps_backend.services.auth import ApiKeyContext, get_api_key_context
 from cps_backend.services.billing_store import get_subscription
 from cps_backend.services.stripe_service import (
+    ClearCheckUnknownCheckError,
     StripeNotConfiguredError,
     construct_webhook_event,
     create_checkout_session,
@@ -104,23 +106,31 @@ async def stripe_webhook(request: Request) -> dict:
     payload = await request.body()
     sig_header = request.headers.get("stripe-signature")
 
-    if not sig_header:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Missing Stripe-Signature header.",
-        )
-
     try:
         event = construct_webhook_event(payload, sig_header)
-    except stripe.error.SignatureVerificationError:
+    except stripe.SignatureVerificationError:
         logger.warning("stripe webhook signature verification failed")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid signature."
-        )
-    except StripeNotConfiguredError as e:
+        ) from None
+    except StripeNotConfiguredError:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e)
-        )
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Stripe webhook is temporarily unavailable.",
+        ) from None
+    except (ValueError, TypeError, AttributeError):
+        # Includes invalid JSON and UTF-8. Do not log the body or exception.
+        logger.warning("stripe webhook payload is invalid")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid webhook payload."
+        ) from None
 
-    handle_webhook_event(event)
+    try:
+        handle_webhook_event(event)
+    except (ClearCheckUnknownCheckError, clearcheck_store.ClearCheckStoreError):
+        logger.warning("clearcheck webhook processing temporarily unavailable")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Webhook processing is temporarily unavailable.",
+        ) from None
     return {"received": True}
