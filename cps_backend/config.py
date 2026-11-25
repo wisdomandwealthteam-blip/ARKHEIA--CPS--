@@ -8,7 +8,20 @@ set real values via environment variables in production.
 from __future__ import annotations
 
 import os
+import re
 from dataclasses import dataclass, field
+
+
+def _clearcheck_price_cents() -> int | None:
+    """Preserve valid integer settings; defer invalid configuration to checkout."""
+    value = os.environ.get("CPS_CLEARCHECK_PRICE_CENTS", "999").strip()
+    if not re.fullmatch(r"[+-]?[0-9]+", value):
+        return None
+    try:
+        return int(value)
+    except ValueError:
+        # Includes excessively long integers rejected by Python's safety limit.
+        return None
 
 
 def _env_bool(name: str, default: bool) -> bool:
@@ -98,9 +111,7 @@ class Settings:
     clearcheck_store_path: str = os.environ.get(
         "CPS_CLEARCHECK_STORE_PATH", "data/clearcheck_checks.json"
     )
-    clearcheck_price_cents: int = int(
-        os.environ.get("CPS_CLEARCHECK_PRICE_CENTS", "999")
-    )
+    clearcheck_price_cents: int | None = field(default_factory=_clearcheck_price_cents)
 
 
 settings = Settings()

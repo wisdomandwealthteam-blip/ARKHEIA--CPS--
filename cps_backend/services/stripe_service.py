@@ -12,7 +12,10 @@ functions will work against real Stripe — see docs/BILLING.md.
 """
 from __future__ import annotations
 
+import ipaddress
+import re
 from typing import Any
+from urllib.parse import urlencode, urlsplit, urlunsplit
 
 import stripe
 
@@ -38,12 +41,67 @@ class StripeNotConfiguredError(Exception):
     configured — fails loudly rather than silently no-op-ing."""
 
 
+class StripeCheckoutConfigurationError(Exception):
+    """Raised when ClearCheck checkout configuration is invalid."""
+
+
+class StripeCheckoutInvalidSessionError(Exception):
+    """Raised when Stripe returns an unsafe or missing checkout URL."""
+
+
+class ClearCheckUnknownCheckError(Exception):
+    """A paid webhook refers to a check not currently in the store."""
+
+
 def _require_configured() -> None:
-    if not settings.stripe_secret_key:
+    if (
+        not isinstance(settings.stripe_secret_key, str)
+        or not settings.stripe_secret_key.strip()
+    ):
         raise StripeNotConfiguredError(
             "STRIPE_SECRET_KEY is not set. See docs/BILLING.md before "
             "using billing endpoints."
         )
+
+
+def _validated_url(value: object, *, schemes: set[str], no_query_fragment: bool = False):
+    """Parse an unambiguous absolute web URL; never include its value in errors."""
+    if (
+        not isinstance(value, str)
+        or not value
+        or any(c.isspace() or ord(c) < 32 or 127 <= ord(c) <= 159 for c in value)
+        or "\\" in value
+        or (no_query_fragment and ("?" in value or "#" in value))
+    ):
+        raise ValueError("Invalid URL")
+    try:
+        parsed = urlsplit(value)
+        host = parsed.hostname
+        # Accessing port validates both its syntax and numeric range.
+        _ = parsed.port
+        if (
+            parsed.scheme not in schemes
+            or not parsed.netloc
+            or not host
+            or "@" in parsed.netloc
+            or parsed.username is not None
+            or parsed.password is not None
+            or parsed.netloc.endswith(":")
+            or "%" in host
+        ):
+            raise ValueError("Invalid URL")
+        try:
+            ipaddress.ip_address(host)
+        except ValueError:
+            ascii_host = host.encode("idna").decode("ascii").rstrip(".")
+            if len(ascii_host) > 253 or not ascii_host or any(
+                not re.fullmatch(r"[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?", label)
+                for label in ascii_host.split(".")
+            ):
+                raise ValueError("Invalid URL")
+        return parsed
+    except (ValueError, UnicodeError):
+        raise ValueError("Invalid URL") from None
 
 
 def create_checkout_session(
@@ -109,32 +167,56 @@ def create_clearcheck_checkout_session(
     webhook knows which check to unlock."""
     _require_configured()
 
+    price = settings.clearcheck_price_cents
+    if type(price) is not int or price <= 0:
+        raise StripeCheckoutConfigurationError("ClearCheck checkout is not configured.")
+    try:
+        frontend = _validated_url(
+            settings.frontend_base_url,
+            schemes={"http", "https"},
+            no_query_fragment=True,
+        )
+    except ValueError:
+        raise StripeCheckoutConfigurationError(
+            "ClearCheck checkout is not configured."
+        ) from None
+
+    def callback(result: str) -> str:
+        return urlunsplit((
+            frontend.scheme,
+            frontend.netloc,
+            frontend.path.rstrip("/") + "/",
+            urlencode({"clearcheck": result, "checkout": result, "check_id": check_id}),
+            "",
+        ))
+
     session = stripe.checkout.Session.create(
         mode="payment",
         line_items=[
             {
                 "price_data": {
                     "currency": "usd",
-                    "unit_amount": settings.clearcheck_price_cents,
+                    "unit_amount": price,
                     "product_data": {"name": "ClearCheck full report"},
                 },
                 "quantity": 1,
             }
         ],
-        success_url=f"{settings.frontend_base_url}/?clearcheck=success",
-        cancel_url=f"{settings.frontend_base_url}/?clearcheck=cancelled",
+        success_url=callback("success"),
+        cancel_url=callback("cancelled"),
         customer_email=customer_email,
         client_reference_id=check_id,
         metadata={"purpose": "clearcheck_unlock", "check_id": check_id},
     )
-    logger.info(
-        "clearcheck checkout session created check_id=%s session_id=%s "
-        "customer_email=%s",
-        check_id,
-        session.id,
-        mask_email(customer_email),
-    )
-    return session.url
+    checkout_url = getattr(session, "url", None)
+    try:
+        _validated_url(checkout_url, schemes={"https"})
+    except ValueError:
+        raise StripeCheckoutInvalidSessionError(
+            "Stripe returned an invalid checkout session."
+        ) from None
+    logger.info("clearcheck checkout session created")
+    return checkout_url
 
 
 def create_portal_session(stripe_customer_id: str) -> str:
@@ -150,17 +232,33 @@ def create_portal_session(stripe_customer_id: str) -> str:
     return session.url
 
 
-def construct_webhook_event(payload: bytes, sig_header: str) -> stripe.Event:
-    """Verifies the webhook signature and returns the parsed event.
-    Raises stripe.error.SignatureVerificationError on a bad signature —
+def construct_webhook_event(payload: bytes, sig_header: str | None) -> stripe.Event:
+    """Verify the signature using the webhook secret, not the API key.
+    Raises stripe.SignatureVerificationError on a bad signature —
     the router turns that into an HTTP 400. NEVER process a webhook body
     without this verification step; an unverified endpoint lets anyone
     on the internet claim to be Stripe and grant themselves a
     subscription."""
-    _require_configured()
-    return stripe.Webhook.construct_event(
+    if (
+        not isinstance(settings.stripe_webhook_secret, str)
+        or not settings.stripe_webhook_secret.strip()
+    ):
+        raise StripeNotConfiguredError("Stripe webhook is not configured.")
+    event = stripe.Webhook.construct_event(
         payload, sig_header, settings.stripe_webhook_secret
     )
+    event_dict = _as_dict(event)
+    data = event_dict.get("data")
+    if (
+        not isinstance(event_dict.get("id"), str)
+        or not event_dict["id"]
+        or not isinstance(event_dict.get("type"), str)
+        or not event_dict["type"]
+        or not isinstance(data, dict)
+        or not isinstance(data.get("object"), dict)
+    ):
+        raise ValueError("Invalid webhook event")
+    return event
 
 
 def _as_dict(obj: Any) -> dict:
@@ -178,7 +276,7 @@ def handle_webhook_event(event: stripe.Event) -> None:
     event types are logged and ignored, not treated as errors — Stripe
     sends many event types we don't need to act on."""
     event_type = event["type"]
-    logger.info("stripe webhook received type=%s id=%s", event_type, event["id"])
+    logger.info("stripe webhook received")
 
     data_object = _as_dict(event["data"]["object"])
 
@@ -191,10 +289,15 @@ def handle_webhook_event(event: stripe.Event) -> None:
         _handle_subscription_deleted(data_object)
     elif event_type == "invoice.payment_failed":
         _handle_payment_failed(data_object)
-    elif event_type == "checkout.session.completed":
+    elif event_type in (
+        "checkout.session.completed",
+        "checkout.session.async_payment_succeeded",
+    ):
         _handle_checkout_completed(data_object, event["id"])
+    elif event_type == "checkout.session.async_payment_failed":
+        logger.info("checkout asynchronous payment failed; no unlock performed")
     else:
-        logger.info("stripe webhook type=%s not handled (no-op)", event_type)
+        logger.info("stripe webhook event not handled (no-op)")
 
 
 def _handle_checkout_completed(session: dict, event_id: str) -> None:
@@ -205,27 +308,19 @@ def _handle_checkout_completed(session: dict, event_id: str) -> None:
     customer.subscription.* events instead."""
     metadata = session.get("metadata") or {}
     if metadata.get("purpose") != "clearcheck_unlock":
-        logger.info(
-            "checkout.session.completed session=%s is not a clearcheck "
-            "unlock (no-op)",
-            session.get("id"),
-        )
+        logger.info("checkout session is not a clearcheck unlock (no-op)")
+        return
+    if session.get("mode") != "payment" or session.get("payment_status") != "paid":
+        logger.info("clearcheck checkout is not a paid one-time payment (no-op)")
         return
     check_id = metadata.get("check_id")
     if not check_id:
-        logger.error(
-            "clearcheck checkout session %s completed without a check_id "
-            "in metadata — cannot unlock anything",
-            session.get("id"),
-        )
+        logger.error("clearcheck checkout lacks a check_id; no unlock performed")
         return
     outcome = clearcheck_store.mark_unlocked(check_id, event_id)
-    logger.info(
-        "clearcheck unlock outcome=%s check_id=%s event=%s",
-        outcome,
-        check_id,
-        event_id,
-    )
+    if outcome == clearcheck_store.UNKNOWN_CHECK:
+        raise ClearCheckUnknownCheckError("ClearCheck payment cannot yet be processed.")
+    logger.info("clearcheck payment processed")
 
 
 def _tenant_id_from_subscription(subscription: dict) -> str | None:

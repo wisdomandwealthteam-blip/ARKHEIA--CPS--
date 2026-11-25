@@ -8,7 +8,9 @@ line or echoed back in an error/preview response.
 """
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, get_args
+
+from pydantic_core import ErrorType
 
 # Request fields whose submitted values must never appear verbatim in
 # logs or error responses.
@@ -94,3 +96,73 @@ def redact_validation_errors(errors: list[dict[str, Any]]) -> list[dict[str, Any
             err["ctx"] = REDACTED
         scrubbed.append(err)
     return scrubbed
+
+
+# Only these framework-defined codes, not arbitrary custom error types, may
+# be returned. Messages are authored here rather than copied from Pydantic:
+# custom validator messages (and some built-in messages) can contain inputs.
+_VALIDATION_CODES = frozenset(get_args(ErrorType))
+_VALIDATION_MESSAGES = {
+    "missing": "Field required",
+    "json_invalid": "Invalid JSON",
+    "model_type": "Input should be a valid object",
+    "model_attributes_type": "Input should be a valid object",
+    "extra_forbidden": "Extra inputs are not permitted",
+    "string_type": "Input should be a valid string",
+    "string_too_short": "String is too short",
+    "string_too_long": "String is too long",
+    "string_pattern_mismatch": "String does not match the required pattern",
+    "int_type": "Input should be a valid integer",
+    "int_parsing": "Input should be a valid integer",
+    "float_type": "Input should be a valid number",
+    "float_parsing": "Input should be a valid number",
+    "bool_type": "Input should be a valid boolean",
+    "bool_parsing": "Input should be a valid boolean",
+    "list_type": "Input should be a valid list",
+    "dict_type": "Input should be a valid object",
+    "date_type": "Input should be a valid date",
+    "date_parsing": "Input should be a valid date",
+    "date_from_datetime_parsing": "Input should be a valid date",
+    "enum": "Input should be an allowed value",
+    "literal_error": "Input should be an allowed value",
+    "greater_than": "Input is below the allowed range",
+    "greater_than_equal": "Input is below the allowed range",
+    "less_than": "Input is above the allowed range",
+    "less_than_equal": "Input is above the allowed range",
+    "too_short": "Input has too few items",
+    "too_long": "Input has too many items",
+    "value_error": "Invalid value",
+    "assertion_error": "Invalid value",
+}
+
+
+def safe_validation_errors(
+    errors: list[dict[str, Any]], location_names: set[str]
+) -> list[dict[str, Any]]:
+    """Return only trusted codes, schema locations and static messages.
+
+    Error input and ctx are intentionally omitted completely, even for
+    seemingly non-sensitive fields. Unknown location components can be
+    user-supplied dictionary/extra keys; numeric components are masked too,
+    since they might be dictionary keys rather than array positions.
+    """
+    result = []
+    for error in errors:
+        code = error.get("type")
+        if not isinstance(code, str) or code not in _VALIDATION_CODES:
+            code = "validation_error"
+        loc = error.get("loc", ())
+        if not isinstance(loc, (tuple, list)):
+            loc = ()
+        safe_loc = tuple(
+            part if isinstance(part, str) and part in location_names else REDACTED
+            for part in loc
+        )
+        result.append(
+            {
+                "type": code,
+                "loc": safe_loc,
+                "msg": _VALIDATION_MESSAGES.get(code, "Invalid value"),
+            }
+        )
+    return result

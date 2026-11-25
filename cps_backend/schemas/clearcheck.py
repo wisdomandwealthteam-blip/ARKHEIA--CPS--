@@ -81,7 +81,7 @@ class ClearCheckReportResponse(BaseModel):
 
 
 class ClearCheckCheckoutRequest(BaseModel):
-    check_id: str
+    check_id: str = Field(strict=True)
     customer_email: str | None = None
 
 
