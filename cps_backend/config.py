@@ -82,8 +82,8 @@ class Settings:
     # Stripe / billing configuration.
     # Secret key and webhook secret MUST come from environment variables —
     # never hardcode these or commit them to version control.
-    stripe_secret_key: str = os.environ.get("STRIPE_SECRET_KEY", "")
-    stripe_webhook_secret: str = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
+    stripe_secret_key: str = os.environ.get("STRIPE_SECRET_KEY", "").strip()
+    stripe_webhook_secret: str = os.environ.get("STRIPE_WEBHOOK_SECRET", "").strip()
 
     # Price IDs from your Stripe Dashboard (see docs/BILLING.md for how to
     # create these). Free tier has no Stripe price — it's not a paid
