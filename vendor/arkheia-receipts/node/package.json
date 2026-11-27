@@ -1,0 +1,21 @@
+{
+  "name": "@arkheia/receipt",
+  "version": "1.0.0",
+  "description": "ARKHEIA DVE canonical receipts: RFC 8785 JCS, strict JSON, schema v1.0.0, Ed25519 via node:crypto",
+  "type": "module",
+  "main": "./src/index.mjs",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": { "types": "./index.d.ts", "import": "./src/index.mjs", "require": "./src/index.mjs" }
+  },
+  "files": ["src", "schema", "scripts", "index.d.ts"],
+  "engines": { "node": ">=22.12.0" },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "keygen": "node scripts/keygen.mjs",
+    "vectors": "node scripts/gen-vectors.mjs ../test-vectors/vectors.json"
+  },
+  "license": "UNLICENSED",
+  "author": "Eric A. Scott / ARKHEIA GROUP",
+  "private": true
+}

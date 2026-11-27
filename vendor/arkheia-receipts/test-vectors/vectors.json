@@ -1,0 +1,1009 @@
+{
+  "description": "ARKHEIA DVE receipt v1.0.0 cross-language vectors. RFC 8032 TEST 1 seed — PUBLIC, TEST ONLY.",
+  "rfc8032_kat": {
+    "seed_hex": "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60",
+    "public_key_hex": "d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a",
+    "empty_message_signature_hex": "e5564300c360ac729086e2cc806e828a84877f1eb8e5d974d873e065224901555fb8821590a33bacc61e39701cf9b46bd25bf5f0595bbe24655141438e7a100b"
+  },
+  "keyring": {
+    "keys": [
+      {
+        "public_key_id": "ed25519:21fe31dfa154a261",
+        "algorithm": "Ed25519",
+        "public_key_hex": "d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a",
+        "status": "active"
+      }
+    ]
+  },
+  "chain": [
+    {
+      "input": {
+        "case_id": "CC-0001",
+        "asset": "track-01.wav",
+        "rights_holder": "Example Holder",
+        "unicode_é中😀": "ok\n\t\"q\""
+      },
+      "input_canonical": "{\"asset\":\"track-01.wav\",\"case_id\":\"CC-0001\",\"rights_holder\":\"Example Holder\",\"unicode_é中😀\":\"ok\\n\\t\\\"q\\\"\"}",
+      "receipt": {
+        "schema_version": "1.0.0",
+        "engine_id": "supreme_kernel",
+        "commit_sha": "e16c0daa0814db8fb80115a0937436e80113d9a3",
+        "wrapper_domain": "clearcheck",
+        "timestamp_utc": "2026-11-25T12:00:00.000Z",
+        "sequence": 0,
+        "input_digest": "2d8dc35a008fad9017ef3cf5500dc4c8722dfed6374e35e04071bf5d7b509c94",
+        "verdict_payload": {
+          "verdict": "CLEARED",
+          "reason_codes": [
+            "ALL_SPLITS_SIGNED",
+            "CHAIN_OF_TITLE_COMPLETE"
+          ],
+          "rule_set": {
+            "id": "clearcheck.rules",
+            "version": "1.0.0"
+          },
+          "evidence_digests": [
+            "2d8dc35a008fad9017ef3cf5500dc4c8722dfed6374e35e04071bf5d7b509c94"
+          ],
+          "metrics": {
+            "splits_total_bps": 10000
+          },
+          "determinism": {
+            "mode": "deterministic",
+            "fallback_used": false
+          }
+        },
+        "prev_receipt_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key_id": "ed25519:21fe31dfa154a261",
+          "value": "954815a75f67c877454ca4ed5847e0dbde53a9b718004e97998860de511c8d0363a90c8ab52c6868054b16903c7b7cd9ec20e999b8ec9fda6ca90c462759530a"
+        }
+      },
+      "signing_input_hex": "61726b686569612e726563656970742e7631007b22636f6d6d69745f736861223a2265313663306461613038313464623866623830313135613039333734333665383031313364396133222c22656e67696e655f6964223a2273757072656d655f6b65726e656c222c22696e7075745f646967657374223a2232643864633335613030386661643930313765663363663535303064633463383732326466656436333734653335653034303731626635643762353039633934222c22707265765f726563656970745f68617368223a2230303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030222c22736368656d615f76657273696f6e223a22312e302e30222c2273657175656e6365223a302c2274696d657374616d705f757463223a22323032362d31312d32355431323a30303a30302e3030305a222c22766572646963745f7061796c6f6164223a7b2264657465726d696e69736d223a7b2266616c6c6261636b5f75736564223a66616c73652c226d6f6465223a2264657465726d696e6973746963227d2c2265766964656e63655f64696765737473223a5b2232643864633335613030386661643930313765663363663535303064633463383732326466656436333734653335653034303731626635643762353039633934225d2c226d657472696373223a7b2273706c6974735f746f74616c5f627073223a31303030307d2c22726561736f6e5f636f646573223a5b22414c4c5f53504c4954535f5349474e4544222c22434841494e5f4f465f5449544c455f434f4d504c455445225d2c2272756c655f736574223a7b226964223a22636c656172636865636b2e72756c6573222c2276657273696f6e223a22312e302e30227d2c2276657264696374223a22434c4541524544227d2c22777261707065725f646f6d61696e223a22636c656172636865636b227d",
+      "receipt_canonical": "{\"commit_sha\":\"e16c0daa0814db8fb80115a0937436e80113d9a3\",\"engine_id\":\"supreme_kernel\",\"input_digest\":\"2d8dc35a008fad9017ef3cf5500dc4c8722dfed6374e35e04071bf5d7b509c94\",\"prev_receipt_hash\":\"0000000000000000000000000000000000000000000000000000000000000000\",\"schema_version\":\"1.0.0\",\"sequence\":0,\"signature\":{\"algorithm\":\"Ed25519\",\"public_key_id\":\"ed25519:21fe31dfa154a261\",\"value\":\"954815a75f67c877454ca4ed5847e0dbde53a9b718004e97998860de511c8d0363a90c8ab52c6868054b16903c7b7cd9ec20e999b8ec9fda6ca90c462759530a\"},\"timestamp_utc\":\"2026-11-25T12:00:00.000Z\",\"verdict_payload\":{\"determinism\":{\"fallback_used\":false,\"mode\":\"deterministic\"},\"evidence_digests\":[\"2d8dc35a008fad9017ef3cf5500dc4c8722dfed6374e35e04071bf5d7b509c94\"],\"metrics\":{\"splits_total_bps\":10000},\"reason_codes\":[\"ALL_SPLITS_SIGNED\",\"CHAIN_OF_TITLE_COMPLETE\"],\"rule_set\":{\"id\":\"clearcheck.rules\",\"version\":\"1.0.0\"},\"verdict\":\"CLEARED\"},\"wrapper_domain\":\"clearcheck\"}",
+      "receipt_hash": "fbfa5f486310bb5fc752131acde131346c387fa28eb3e983e4744e524b70ddf2"
+    },
+    {
+      "input": {
+        "case_id": "MG-0002",
+        "bytes_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "sample_rate_hz": 48000
+      },
+      "input_canonical": "{\"bytes_sha256\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"case_id\":\"MG-0002\",\"sample_rate_hz\":48000}",
+      "receipt": {
+        "schema_version": "1.0.0",
+        "engine_id": "supreme_kernel",
+        "commit_sha": "e16c0daa0814db8fb80115a0937436e80113d9a3",
+        "wrapper_domain": "musicguard",
+        "timestamp_utc": "2026-11-25T12:00:01.000Z",
+        "sequence": 1,
+        "input_digest": "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0",
+        "verdict_payload": {
+          "verdict": "AI_ASSISTED",
+          "reason_codes": [
+            "STEM_SIGNATURE_MATCH"
+          ],
+          "rule_set": {
+            "id": "musicguard.forensics",
+            "version": "3.1.0"
+          },
+          "evidence_digests": [
+            "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0"
+          ],
+          "metrics": {
+            "confidence_bps": 8125,
+            "segments_flagged": 3
+          },
+          "determinism": {
+            "mode": "deterministic",
+            "fallback_used": false
+          }
+        },
+        "prev_receipt_hash": "fbfa5f486310bb5fc752131acde131346c387fa28eb3e983e4744e524b70ddf2",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key_id": "ed25519:21fe31dfa154a261",
+          "value": "16cdaa1bd0273cf5d7ecf9b9c80f7841ae7e63313160cb971f51409f3bbe6b0d2503d444204f2cbf16af52cca406823c32b6cc02d1d316ef6e2ea69c10709200"
+        }
+      },
+      "signing_input_hex": "61726b686569612e726563656970742e7631007b22636f6d6d69745f736861223a2265313663306461613038313464623866623830313135613039333734333665383031313364396133222c22656e67696e655f6964223a2273757072656d655f6b65726e656c222c22696e7075745f646967657374223a2232363338346666313634363339643961396366643364393235336239633266613136613964376437623232353363333235363538306530616132376132646130222c22707265765f726563656970745f68617368223a2266626661356634383633313062623566633735323133316163646531333133343663333837666132386562336539383365343734346535323462373064646632222c22736368656d615f76657273696f6e223a22312e302e30222c2273657175656e6365223a312c2274696d657374616d705f757463223a22323032362d31312d32355431323a30303a30312e3030305a222c22766572646963745f7061796c6f6164223a7b2264657465726d696e69736d223a7b2266616c6c6261636b5f75736564223a66616c73652c226d6f6465223a2264657465726d696e6973746963227d2c2265766964656e63655f64696765737473223a5b2232363338346666313634363339643961396366643364393235336239633266613136613964376437623232353363333235363538306530616132376132646130225d2c226d657472696373223a7b22636f6e666964656e63655f627073223a383132352c227365676d656e74735f666c6167676564223a337d2c22726561736f6e5f636f646573223a5b225354454d5f5349474e41545552455f4d41544348225d2c2272756c655f736574223a7b226964223a226d7573696367756172642e666f72656e73696373222c2276657273696f6e223a22332e312e30227d2c2276657264696374223a2241495f4153534953544544227d2c22777261707065725f646f6d61696e223a226d757369636775617264227d",
+      "receipt_canonical": "{\"commit_sha\":\"e16c0daa0814db8fb80115a0937436e80113d9a3\",\"engine_id\":\"supreme_kernel\",\"input_digest\":\"26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0\",\"prev_receipt_hash\":\"fbfa5f486310bb5fc752131acde131346c387fa28eb3e983e4744e524b70ddf2\",\"schema_version\":\"1.0.0\",\"sequence\":1,\"signature\":{\"algorithm\":\"Ed25519\",\"public_key_id\":\"ed25519:21fe31dfa154a261\",\"value\":\"16cdaa1bd0273cf5d7ecf9b9c80f7841ae7e63313160cb971f51409f3bbe6b0d2503d444204f2cbf16af52cca406823c32b6cc02d1d316ef6e2ea69c10709200\"},\"timestamp_utc\":\"2026-11-25T12:00:01.000Z\",\"verdict_payload\":{\"determinism\":{\"fallback_used\":false,\"mode\":\"deterministic\"},\"evidence_digests\":[\"26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0\"],\"metrics\":{\"confidence_bps\":8125,\"segments_flagged\":3},\"reason_codes\":[\"STEM_SIGNATURE_MATCH\"],\"rule_set\":{\"id\":\"musicguard.forensics\",\"version\":\"3.1.0\"},\"verdict\":\"AI_ASSISTED\"},\"wrapper_domain\":\"musicguard\"}",
+      "receipt_hash": "40556fcdbd7d6d100b4f9202d931ba4faa77c2508a25e3357a194c676b578666"
+    },
+    {
+      "input": {
+        "policy": "AC-2(3)",
+        "accounts": [
+          3,
+          1,
+          2
+        ],
+        "nested": {
+          "b": 1,
+          "a": [
+            true,
+            false,
+            null
+          ]
+        }
+      },
+      "input_canonical": "{\"accounts\":[3,1,2],\"nested\":{\"a\":[true,false,null],\"b\":1},\"policy\":\"AC-2(3)\"}",
+      "receipt": {
+        "schema_version": "1.0.0",
+        "engine_id": "supreme_kernel",
+        "commit_sha": "e16c0daa0814db8fb80115a0937436e80113d9a3",
+        "wrapper_domain": "governancecheck",
+        "timestamp_utc": "2026-11-25T12:00:02.000Z",
+        "sequence": 2,
+        "input_digest": "41945e259e4bd49ff03368eb032dedf99e74537fc137359bacf969b649ea8bd9",
+        "verdict_payload": {
+          "verdict": "NON_COMPLIANT",
+          "reason_codes": [
+            "AC_2_3_VIOLATION",
+            "DORMANT_ACCOUNT_ACTIVE"
+          ],
+          "rule_set": {
+            "id": "custos.ac2",
+            "version": "1.0.0"
+          },
+          "evidence_digests": [
+            "41945e259e4bd49ff03368eb032dedf99e74537fc137359bacf969b649ea8bd9"
+          ],
+          "metrics": {
+            "dormant_days": 91
+          },
+          "determinism": {
+            "mode": "deterministic",
+            "fallback_used": false
+          }
+        },
+        "prev_receipt_hash": "40556fcdbd7d6d100b4f9202d931ba4faa77c2508a25e3357a194c676b578666",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key_id": "ed25519:21fe31dfa154a261",
+          "value": "86560c042db27d7767ce1fa96265159c122a1e2140c9e089870f570f17647578b3920870529657520e8570650b1a903fdc4fdaebdf24e98be037808c6683bb08"
+        }
+      },
+      "signing_input_hex": "61726b686569612e726563656970742e7631007b22636f6d6d69745f736861223a2265313663306461613038313464623866623830313135613039333734333665383031313364396133222c22656e67696e655f6964223a2273757072656d655f6b65726e656c222c22696e7075745f646967657374223a2234313934356532353965346264343966663033333638656230333264656466393965373435333766633133373335396261636639363962363439656138626439222c22707265765f726563656970745f68617368223a2234303535366663646264376436643130306234663932303264393331626134666161373763323530386132356533333537613139346336373662353738363636222c22736368656d615f76657273696f6e223a22312e302e30222c2273657175656e6365223a322c2274696d657374616d705f757463223a22323032362d31312d32355431323a30303a30322e3030305a222c22766572646963745f7061796c6f6164223a7b2264657465726d696e69736d223a7b2266616c6c6261636b5f75736564223a66616c73652c226d6f6465223a2264657465726d696e6973746963227d2c2265766964656e63655f64696765737473223a5b2234313934356532353965346264343966663033333638656230333264656466393965373435333766633133373335396261636639363962363439656138626439225d2c226d657472696373223a7b22646f726d616e745f64617973223a39317d2c22726561736f6e5f636f646573223a5b2241435f325f335f56494f4c4154494f4e222c22444f524d414e545f4143434f554e545f414354495645225d2c2272756c655f736574223a7b226964223a22637573746f732e616332222c2276657273696f6e223a22312e302e30227d2c2276657264696374223a224e4f4e5f434f4d504c49414e54227d2c22777261707065725f646f6d61696e223a22676f7665726e616e6365636865636b227d",
+      "receipt_canonical": "{\"commit_sha\":\"e16c0daa0814db8fb80115a0937436e80113d9a3\",\"engine_id\":\"supreme_kernel\",\"input_digest\":\"41945e259e4bd49ff03368eb032dedf99e74537fc137359bacf969b649ea8bd9\",\"prev_receipt_hash\":\"40556fcdbd7d6d100b4f9202d931ba4faa77c2508a25e3357a194c676b578666\",\"schema_version\":\"1.0.0\",\"sequence\":2,\"signature\":{\"algorithm\":\"Ed25519\",\"public_key_id\":\"ed25519:21fe31dfa154a261\",\"value\":\"86560c042db27d7767ce1fa96265159c122a1e2140c9e089870f570f17647578b3920870529657520e8570650b1a903fdc4fdaebdf24e98be037808c6683bb08\"},\"timestamp_utc\":\"2026-11-25T12:00:02.000Z\",\"verdict_payload\":{\"determinism\":{\"fallback_used\":false,\"mode\":\"deterministic\"},\"evidence_digests\":[\"41945e259e4bd49ff03368eb032dedf99e74537fc137359bacf969b649ea8bd9\"],\"metrics\":{\"dormant_days\":91},\"reason_codes\":[\"AC_2_3_VIOLATION\",\"DORMANT_ACCOUNT_ACTIVE\"],\"rule_set\":{\"id\":\"custos.ac2\",\"version\":\"1.0.0\"},\"verdict\":\"NON_COMPLIANT\"},\"wrapper_domain\":\"governancecheck\"}",
+      "receipt_hash": "ccfa494484565ca3809f74ac3689323443ffd6b257b07b823ad4e6ef906d192d"
+    }
+  ],
+  "negative": [
+    {
+      "name": "verdict_payload_metric_changed_by_one",
+      "receipt": {
+        "schema_version": "1.0.0",
+        "engine_id": "supreme_kernel",
+        "commit_sha": "e16c0daa0814db8fb80115a0937436e80113d9a3",
+        "wrapper_domain": "musicguard",
+        "timestamp_utc": "2026-11-25T12:00:01.000Z",
+        "sequence": 1,
+        "input_digest": "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0",
+        "verdict_payload": {
+          "verdict": "AI_ASSISTED",
+          "reason_codes": [
+            "STEM_SIGNATURE_MATCH"
+          ],
+          "rule_set": {
+            "id": "musicguard.forensics",
+            "version": "3.1.0"
+          },
+          "evidence_digests": [
+            "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0"
+          ],
+          "metrics": {
+            "confidence_bps": 8126,
+            "segments_flagged": 3
+          },
+          "determinism": {
+            "mode": "deterministic",
+            "fallback_used": false
+          }
+        },
+        "prev_receipt_hash": "fbfa5f486310bb5fc752131acde131346c387fa28eb3e983e4744e524b70ddf2",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key_id": "ed25519:21fe31dfa154a261",
+          "value": "16cdaa1bd0273cf5d7ecf9b9c80f7841ae7e63313160cb971f51409f3bbe6b0d2503d444204f2cbf16af52cca406823c32b6cc02d1d316ef6e2ea69c10709200"
+        }
+      },
+      "expected_error_code": "SIGNATURE_INVALID"
+    },
+    {
+      "name": "verdict_payload_reason_byte_flipped",
+      "receipt": {
+        "schema_version": "1.0.0",
+        "engine_id": "supreme_kernel",
+        "commit_sha": "e16c0daa0814db8fb80115a0937436e80113d9a3",
+        "wrapper_domain": "musicguard",
+        "timestamp_utc": "2026-11-25T12:00:01.000Z",
+        "sequence": 1,
+        "input_digest": "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0",
+        "verdict_payload": {
+          "verdict": "AI_ASSISTED",
+          "reason_codes": [
+            "STEM_SIGNATURE_MATCI"
+          ],
+          "rule_set": {
+            "id": "musicguard.forensics",
+            "version": "3.1.0"
+          },
+          "evidence_digests": [
+            "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0"
+          ],
+          "metrics": {
+            "confidence_bps": 8125,
+            "segments_flagged": 3
+          },
+          "determinism": {
+            "mode": "deterministic",
+            "fallback_used": false
+          }
+        },
+        "prev_receipt_hash": "fbfa5f486310bb5fc752131acde131346c387fa28eb3e983e4744e524b70ddf2",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key_id": "ed25519:21fe31dfa154a261",
+          "value": "16cdaa1bd0273cf5d7ecf9b9c80f7841ae7e63313160cb971f51409f3bbe6b0d2503d444204f2cbf16af52cca406823c32b6cc02d1d316ef6e2ea69c10709200"
+        }
+      },
+      "expected_error_code": "SIGNATURE_INVALID"
+    },
+    {
+      "name": "prev_receipt_hash_byte_flipped",
+      "receipt": {
+        "schema_version": "1.0.0",
+        "engine_id": "supreme_kernel",
+        "commit_sha": "e16c0daa0814db8fb80115a0937436e80113d9a3",
+        "wrapper_domain": "musicguard",
+        "timestamp_utc": "2026-11-25T12:00:01.000Z",
+        "sequence": 1,
+        "input_digest": "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0",
+        "verdict_payload": {
+          "verdict": "AI_ASSISTED",
+          "reason_codes": [
+            "STEM_SIGNATURE_MATCH"
+          ],
+          "rule_set": {
+            "id": "musicguard.forensics",
+            "version": "3.1.0"
+          },
+          "evidence_digests": [
+            "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0"
+          ],
+          "metrics": {
+            "confidence_bps": 8125,
+            "segments_flagged": 3
+          },
+          "determinism": {
+            "mode": "deterministic",
+            "fallback_used": false
+          }
+        },
+        "prev_receipt_hash": "fbfa5f486300bb5fc752131acde131346c387fa28eb3e983e4744e524b70ddf2",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key_id": "ed25519:21fe31dfa154a261",
+          "value": "16cdaa1bd0273cf5d7ecf9b9c80f7841ae7e63313160cb971f51409f3bbe6b0d2503d444204f2cbf16af52cca406823c32b6cc02d1d316ef6e2ea69c10709200"
+        }
+      },
+      "expected_error_code": "SIGNATURE_INVALID"
+    },
+    {
+      "name": "input_digest_byte_flipped",
+      "receipt": {
+        "schema_version": "1.0.0",
+        "engine_id": "supreme_kernel",
+        "commit_sha": "e16c0daa0814db8fb80115a0937436e80113d9a3",
+        "wrapper_domain": "musicguard",
+        "timestamp_utc": "2026-11-25T12:00:01.000Z",
+        "sequence": 1,
+        "input_digest": "06384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0",
+        "verdict_payload": {
+          "verdict": "AI_ASSISTED",
+          "reason_codes": [
+            "STEM_SIGNATURE_MATCH"
+          ],
+          "rule_set": {
+            "id": "musicguard.forensics",
+            "version": "3.1.0"
+          },
+          "evidence_digests": [
+            "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0"
+          ],
+          "metrics": {
+            "confidence_bps": 8125,
+            "segments_flagged": 3
+          },
+          "determinism": {
+            "mode": "deterministic",
+            "fallback_used": false
+          }
+        },
+        "prev_receipt_hash": "fbfa5f486310bb5fc752131acde131346c387fa28eb3e983e4744e524b70ddf2",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key_id": "ed25519:21fe31dfa154a261",
+          "value": "16cdaa1bd0273cf5d7ecf9b9c80f7841ae7e63313160cb971f51409f3bbe6b0d2503d444204f2cbf16af52cca406823c32b6cc02d1d316ef6e2ea69c10709200"
+        }
+      },
+      "expected_error_code": "SIGNATURE_INVALID"
+    },
+    {
+      "name": "signature_byte_flipped",
+      "receipt": {
+        "schema_version": "1.0.0",
+        "engine_id": "supreme_kernel",
+        "commit_sha": "e16c0daa0814db8fb80115a0937436e80113d9a3",
+        "wrapper_domain": "musicguard",
+        "timestamp_utc": "2026-11-25T12:00:01.000Z",
+        "sequence": 1,
+        "input_digest": "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0",
+        "verdict_payload": {
+          "verdict": "AI_ASSISTED",
+          "reason_codes": [
+            "STEM_SIGNATURE_MATCH"
+          ],
+          "rule_set": {
+            "id": "musicguard.forensics",
+            "version": "3.1.0"
+          },
+          "evidence_digests": [
+            "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0"
+          ],
+          "metrics": {
+            "confidence_bps": 8125,
+            "segments_flagged": 3
+          },
+          "determinism": {
+            "mode": "deterministic",
+            "fallback_used": false
+          }
+        },
+        "prev_receipt_hash": "fbfa5f486310bb5fc752131acde131346c387fa28eb3e983e4744e524b70ddf2",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key_id": "ed25519:21fe31dfa154a261",
+          "value": "16cda01bd0273cf5d7ecf9b9c80f7841ae7e63313160cb971f51409f3bbe6b0d2503d444204f2cbf16af52cca406823c32b6cc02d1d316ef6e2ea69c10709200"
+        }
+      },
+      "expected_error_code": "SIGNATURE_INVALID"
+    },
+    {
+      "name": "timestamp_changed",
+      "receipt": {
+        "schema_version": "1.0.0",
+        "engine_id": "supreme_kernel",
+        "commit_sha": "e16c0daa0814db8fb80115a0937436e80113d9a3",
+        "wrapper_domain": "musicguard",
+        "timestamp_utc": "2026-11-25T12:00:01.001Z",
+        "sequence": 1,
+        "input_digest": "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0",
+        "verdict_payload": {
+          "verdict": "AI_ASSISTED",
+          "reason_codes": [
+            "STEM_SIGNATURE_MATCH"
+          ],
+          "rule_set": {
+            "id": "musicguard.forensics",
+            "version": "3.1.0"
+          },
+          "evidence_digests": [
+            "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0"
+          ],
+          "metrics": {
+            "confidence_bps": 8125,
+            "segments_flagged": 3
+          },
+          "determinism": {
+            "mode": "deterministic",
+            "fallback_used": false
+          }
+        },
+        "prev_receipt_hash": "fbfa5f486310bb5fc752131acde131346c387fa28eb3e983e4744e524b70ddf2",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key_id": "ed25519:21fe31dfa154a261",
+          "value": "16cdaa1bd0273cf5d7ecf9b9c80f7841ae7e63313160cb971f51409f3bbe6b0d2503d444204f2cbf16af52cca406823c32b6cc02d1d316ef6e2ea69c10709200"
+        }
+      },
+      "expected_error_code": "SIGNATURE_INVALID"
+    },
+    {
+      "name": "unknown_signer",
+      "receipt": {
+        "schema_version": "1.0.0",
+        "engine_id": "supreme_kernel",
+        "commit_sha": "e16c0daa0814db8fb80115a0937436e80113d9a3",
+        "wrapper_domain": "musicguard",
+        "timestamp_utc": "2026-11-25T12:00:01.000Z",
+        "sequence": 1,
+        "input_digest": "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0",
+        "verdict_payload": {
+          "verdict": "AI_ASSISTED",
+          "reason_codes": [
+            "STEM_SIGNATURE_MATCH"
+          ],
+          "rule_set": {
+            "id": "musicguard.forensics",
+            "version": "3.1.0"
+          },
+          "evidence_digests": [
+            "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0"
+          ],
+          "metrics": {
+            "confidence_bps": 8125,
+            "segments_flagged": 3
+          },
+          "determinism": {
+            "mode": "deterministic",
+            "fallback_used": false
+          }
+        },
+        "prev_receipt_hash": "fbfa5f486310bb5fc752131acde131346c387fa28eb3e983e4744e524b70ddf2",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key_id": "ed25519:ffffffffffffffff",
+          "value": "16cdaa1bd0273cf5d7ecf9b9c80f7841ae7e63313160cb971f51409f3bbe6b0d2503d444204f2cbf16af52cca406823c32b6cc02d1d316ef6e2ea69c10709200"
+        }
+      },
+      "expected_error_code": "UNKNOWN_SIGNER"
+    },
+    {
+      "name": "verdict_not_allowed_for_domain",
+      "receipt": {
+        "schema_version": "1.0.0",
+        "engine_id": "supreme_kernel",
+        "commit_sha": "e16c0daa0814db8fb80115a0937436e80113d9a3",
+        "wrapper_domain": "musicguard",
+        "timestamp_utc": "2026-11-25T12:00:01.000Z",
+        "sequence": 1,
+        "input_digest": "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0",
+        "verdict_payload": {
+          "verdict": "CLEARED",
+          "reason_codes": [
+            "STEM_SIGNATURE_MATCH"
+          ],
+          "rule_set": {
+            "id": "musicguard.forensics",
+            "version": "3.1.0"
+          },
+          "evidence_digests": [
+            "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0"
+          ],
+          "metrics": {
+            "confidence_bps": 8125,
+            "segments_flagged": 3
+          },
+          "determinism": {
+            "mode": "deterministic",
+            "fallback_used": false
+          }
+        },
+        "prev_receipt_hash": "fbfa5f486310bb5fc752131acde131346c387fa28eb3e983e4744e524b70ddf2",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key_id": "ed25519:21fe31dfa154a261",
+          "value": "16cdaa1bd0273cf5d7ecf9b9c80f7841ae7e63313160cb971f51409f3bbe6b0d2503d444204f2cbf16af52cca406823c32b6cc02d1d316ef6e2ea69c10709200"
+        }
+      },
+      "expected_error_code": "SCHEMA_INVALID"
+    },
+    {
+      "name": "engine_id_is_wrapper_name",
+      "receipt": {
+        "schema_version": "1.0.0",
+        "engine_id": "musicguard",
+        "commit_sha": "e16c0daa0814db8fb80115a0937436e80113d9a3",
+        "wrapper_domain": "musicguard",
+        "timestamp_utc": "2026-11-25T12:00:01.000Z",
+        "sequence": 1,
+        "input_digest": "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0",
+        "verdict_payload": {
+          "verdict": "AI_ASSISTED",
+          "reason_codes": [
+            "STEM_SIGNATURE_MATCH"
+          ],
+          "rule_set": {
+            "id": "musicguard.forensics",
+            "version": "3.1.0"
+          },
+          "evidence_digests": [
+            "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0"
+          ],
+          "metrics": {
+            "confidence_bps": 8125,
+            "segments_flagged": 3
+          },
+          "determinism": {
+            "mode": "deterministic",
+            "fallback_used": false
+          }
+        },
+        "prev_receipt_hash": "fbfa5f486310bb5fc752131acde131346c387fa28eb3e983e4744e524b70ddf2",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key_id": "ed25519:21fe31dfa154a261",
+          "value": "16cdaa1bd0273cf5d7ecf9b9c80f7841ae7e63313160cb971f51409f3bbe6b0d2503d444204f2cbf16af52cca406823c32b6cc02d1d316ef6e2ea69c10709200"
+        }
+      },
+      "expected_error_code": "SCHEMA_INVALID"
+    },
+    {
+      "name": "engine_id_trailing_newline",
+      "receipt": {
+        "schema_version": "1.0.0",
+        "engine_id": "supreme_kernel\n",
+        "commit_sha": "e16c0daa0814db8fb80115a0937436e80113d9a3",
+        "wrapper_domain": "musicguard",
+        "timestamp_utc": "2026-11-25T12:00:01.000Z",
+        "sequence": 1,
+        "input_digest": "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0",
+        "verdict_payload": {
+          "verdict": "AI_ASSISTED",
+          "reason_codes": [
+            "STEM_SIGNATURE_MATCH"
+          ],
+          "rule_set": {
+            "id": "musicguard.forensics",
+            "version": "3.1.0"
+          },
+          "evidence_digests": [
+            "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0"
+          ],
+          "metrics": {
+            "confidence_bps": 8125,
+            "segments_flagged": 3
+          },
+          "determinism": {
+            "mode": "deterministic",
+            "fallback_used": false
+          }
+        },
+        "prev_receipt_hash": "fbfa5f486310bb5fc752131acde131346c387fa28eb3e983e4744e524b70ddf2",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key_id": "ed25519:21fe31dfa154a261",
+          "value": "16cdaa1bd0273cf5d7ecf9b9c80f7841ae7e63313160cb971f51409f3bbe6b0d2503d444204f2cbf16af52cca406823c32b6cc02d1d316ef6e2ea69c10709200"
+        }
+      },
+      "expected_error_code": "SCHEMA_INVALID"
+    },
+    {
+      "name": "extra_top_level_field",
+      "receipt": {
+        "schema_version": "1.0.0",
+        "engine_id": "supreme_kernel",
+        "commit_sha": "e16c0daa0814db8fb80115a0937436e80113d9a3",
+        "wrapper_domain": "musicguard",
+        "timestamp_utc": "2026-11-25T12:00:01.000Z",
+        "sequence": 1,
+        "input_digest": "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0",
+        "verdict_payload": {
+          "verdict": "AI_ASSISTED",
+          "reason_codes": [
+            "STEM_SIGNATURE_MATCH"
+          ],
+          "rule_set": {
+            "id": "musicguard.forensics",
+            "version": "3.1.0"
+          },
+          "evidence_digests": [
+            "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0"
+          ],
+          "metrics": {
+            "confidence_bps": 8125,
+            "segments_flagged": 3
+          },
+          "determinism": {
+            "mode": "deterministic",
+            "fallback_used": false
+          }
+        },
+        "prev_receipt_hash": "fbfa5f486310bb5fc752131acde131346c387fa28eb3e983e4744e524b70ddf2",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key_id": "ed25519:21fe31dfa154a261",
+          "value": "16cdaa1bd0273cf5d7ecf9b9c80f7841ae7e63313160cb971f51409f3bbe6b0d2503d444204f2cbf16af52cca406823c32b6cc02d1d316ef6e2ea69c10709200"
+        },
+        "note": "x"
+      },
+      "expected_error_code": "SCHEMA_INVALID"
+    },
+    {
+      "name": "missing_signature",
+      "receipt": {
+        "schema_version": "1.0.0",
+        "engine_id": "supreme_kernel",
+        "commit_sha": "e16c0daa0814db8fb80115a0937436e80113d9a3",
+        "wrapper_domain": "musicguard",
+        "timestamp_utc": "2026-11-25T12:00:01.000Z",
+        "sequence": 1,
+        "input_digest": "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0",
+        "verdict_payload": {
+          "verdict": "AI_ASSISTED",
+          "reason_codes": [
+            "STEM_SIGNATURE_MATCH"
+          ],
+          "rule_set": {
+            "id": "musicguard.forensics",
+            "version": "3.1.0"
+          },
+          "evidence_digests": [
+            "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0"
+          ],
+          "metrics": {
+            "confidence_bps": 8125,
+            "segments_flagged": 3
+          },
+          "determinism": {
+            "mode": "deterministic",
+            "fallback_used": false
+          }
+        },
+        "prev_receipt_hash": "fbfa5f486310bb5fc752131acde131346c387fa28eb3e983e4744e524b70ddf2"
+      },
+      "expected_error_code": "SCHEMA_INVALID"
+    },
+    {
+      "name": "fallback_used_true",
+      "receipt": {
+        "schema_version": "1.0.0",
+        "engine_id": "supreme_kernel",
+        "commit_sha": "e16c0daa0814db8fb80115a0937436e80113d9a3",
+        "wrapper_domain": "musicguard",
+        "timestamp_utc": "2026-11-25T12:00:01.000Z",
+        "sequence": 1,
+        "input_digest": "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0",
+        "verdict_payload": {
+          "verdict": "AI_ASSISTED",
+          "reason_codes": [
+            "STEM_SIGNATURE_MATCH"
+          ],
+          "rule_set": {
+            "id": "musicguard.forensics",
+            "version": "3.1.0"
+          },
+          "evidence_digests": [
+            "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0"
+          ],
+          "metrics": {
+            "confidence_bps": 8125,
+            "segments_flagged": 3
+          },
+          "determinism": {
+            "mode": "deterministic",
+            "fallback_used": true
+          }
+        },
+        "prev_receipt_hash": "fbfa5f486310bb5fc752131acde131346c387fa28eb3e983e4744e524b70ddf2",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key_id": "ed25519:21fe31dfa154a261",
+          "value": "16cdaa1bd0273cf5d7ecf9b9c80f7841ae7e63313160cb971f51409f3bbe6b0d2503d444204f2cbf16af52cca406823c32b6cc02d1d316ef6e2ea69c10709200"
+        }
+      },
+      "expected_error_code": "SCHEMA_INVALID"
+    },
+    {
+      "name": "uppercase_hex_digest",
+      "receipt": {
+        "schema_version": "1.0.0",
+        "engine_id": "supreme_kernel",
+        "commit_sha": "e16c0daa0814db8fb80115a0937436e80113d9a3",
+        "wrapper_domain": "musicguard",
+        "timestamp_utc": "2026-11-25T12:00:01.000Z",
+        "sequence": 1,
+        "input_digest": "26384FF164639D9A9CFD3D9253B9C2FA16A9D7D7B2253C3256580E0AA27A2DA0",
+        "verdict_payload": {
+          "verdict": "AI_ASSISTED",
+          "reason_codes": [
+            "STEM_SIGNATURE_MATCH"
+          ],
+          "rule_set": {
+            "id": "musicguard.forensics",
+            "version": "3.1.0"
+          },
+          "evidence_digests": [
+            "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0"
+          ],
+          "metrics": {
+            "confidence_bps": 8125,
+            "segments_flagged": 3
+          },
+          "determinism": {
+            "mode": "deterministic",
+            "fallback_used": false
+          }
+        },
+        "prev_receipt_hash": "fbfa5f486310bb5fc752131acde131346c387fa28eb3e983e4744e524b70ddf2",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key_id": "ed25519:21fe31dfa154a261",
+          "value": "16cdaa1bd0273cf5d7ecf9b9c80f7841ae7e63313160cb971f51409f3bbe6b0d2503d444204f2cbf16af52cca406823c32b6cc02d1d316ef6e2ea69c10709200"
+        }
+      },
+      "expected_error_code": "SCHEMA_INVALID"
+    },
+    {
+      "name": "sequence_negative",
+      "receipt": {
+        "schema_version": "1.0.0",
+        "engine_id": "supreme_kernel",
+        "commit_sha": "e16c0daa0814db8fb80115a0937436e80113d9a3",
+        "wrapper_domain": "musicguard",
+        "timestamp_utc": "2026-11-25T12:00:01.000Z",
+        "sequence": -1,
+        "input_digest": "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0",
+        "verdict_payload": {
+          "verdict": "AI_ASSISTED",
+          "reason_codes": [
+            "STEM_SIGNATURE_MATCH"
+          ],
+          "rule_set": {
+            "id": "musicguard.forensics",
+            "version": "3.1.0"
+          },
+          "evidence_digests": [
+            "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0"
+          ],
+          "metrics": {
+            "confidence_bps": 8125,
+            "segments_flagged": 3
+          },
+          "determinism": {
+            "mode": "deterministic",
+            "fallback_used": false
+          }
+        },
+        "prev_receipt_hash": "fbfa5f486310bb5fc752131acde131346c387fa28eb3e983e4744e524b70ddf2",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key_id": "ed25519:21fe31dfa154a261",
+          "value": "16cdaa1bd0273cf5d7ecf9b9c80f7841ae7e63313160cb971f51409f3bbe6b0d2503d444204f2cbf16af52cca406823c32b6cc02d1d316ef6e2ea69c10709200"
+        }
+      },
+      "expected_error_code": "SCHEMA_INVALID"
+    },
+    {
+      "name": "year_zero_timestamp",
+      "receipt": {
+        "schema_version": "1.0.0",
+        "engine_id": "supreme_kernel",
+        "commit_sha": "e16c0daa0814db8fb80115a0937436e80113d9a3",
+        "wrapper_domain": "musicguard",
+        "timestamp_utc": "0000-01-01T00:00:00.000Z",
+        "sequence": 1,
+        "input_digest": "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0",
+        "verdict_payload": {
+          "verdict": "AI_ASSISTED",
+          "reason_codes": [
+            "STEM_SIGNATURE_MATCH"
+          ],
+          "rule_set": {
+            "id": "musicguard.forensics",
+            "version": "3.1.0"
+          },
+          "evidence_digests": [
+            "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0"
+          ],
+          "metrics": {
+            "confidence_bps": 8125,
+            "segments_flagged": 3
+          },
+          "determinism": {
+            "mode": "deterministic",
+            "fallback_used": false
+          }
+        },
+        "prev_receipt_hash": "fbfa5f486310bb5fc752131acde131346c387fa28eb3e983e4744e524b70ddf2",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key_id": "ed25519:21fe31dfa154a261",
+          "value": "16cdaa1bd0273cf5d7ecf9b9c80f7841ae7e63313160cb971f51409f3bbe6b0d2503d444204f2cbf16af52cca406823c32b6cc02d1d316ef6e2ea69c10709200"
+        }
+      },
+      "expected_error_code": "TIMESTAMP_INVALID"
+    },
+    {
+      "name": "duplicate_reason_codes",
+      "receipt": {
+        "schema_version": "1.0.0",
+        "engine_id": "supreme_kernel",
+        "commit_sha": "e16c0daa0814db8fb80115a0937436e80113d9a3",
+        "wrapper_domain": "musicguard",
+        "timestamp_utc": "2026-11-25T12:00:01.000Z",
+        "sequence": 1,
+        "input_digest": "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0",
+        "verdict_payload": {
+          "verdict": "AI_ASSISTED",
+          "reason_codes": [
+            "A",
+            "A"
+          ],
+          "rule_set": {
+            "id": "musicguard.forensics",
+            "version": "3.1.0"
+          },
+          "evidence_digests": [
+            "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0"
+          ],
+          "metrics": {
+            "confidence_bps": 8125,
+            "segments_flagged": 3
+          },
+          "determinism": {
+            "mode": "deterministic",
+            "fallback_used": false
+          }
+        },
+        "prev_receipt_hash": "fbfa5f486310bb5fc752131acde131346c387fa28eb3e983e4744e524b70ddf2",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key_id": "ed25519:21fe31dfa154a261",
+          "value": "16cdaa1bd0273cf5d7ecf9b9c80f7841ae7e63313160cb971f51409f3bbe6b0d2503d444204f2cbf16af52cca406823c32b6cc02d1d316ef6e2ea69c10709200"
+        }
+      },
+      "expected_error_code": "SCHEMA_INVALID"
+    },
+    {
+      "name": "genesis_rule_seq0_nonzero_prev",
+      "receipt": {
+        "schema_version": "1.0.0",
+        "engine_id": "supreme_kernel",
+        "commit_sha": "e16c0daa0814db8fb80115a0937436e80113d9a3",
+        "wrapper_domain": "musicguard",
+        "timestamp_utc": "2026-11-25T12:00:01.000Z",
+        "sequence": 0,
+        "input_digest": "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0",
+        "verdict_payload": {
+          "verdict": "AI_ASSISTED",
+          "reason_codes": [
+            "STEM_SIGNATURE_MATCH"
+          ],
+          "rule_set": {
+            "id": "musicguard.forensics",
+            "version": "3.1.0"
+          },
+          "evidence_digests": [
+            "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0"
+          ],
+          "metrics": {
+            "confidence_bps": 8125,
+            "segments_flagged": 3
+          },
+          "determinism": {
+            "mode": "deterministic",
+            "fallback_used": false
+          }
+        },
+        "prev_receipt_hash": "fbfa5f486310bb5fc752131acde131346c387fa28eb3e983e4744e524b70ddf2",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key_id": "ed25519:21fe31dfa154a261",
+          "value": "16cdaa1bd0273cf5d7ecf9b9c80f7841ae7e63313160cb971f51409f3bbe6b0d2503d444204f2cbf16af52cca406823c32b6cc02d1d316ef6e2ea69c10709200"
+        }
+      },
+      "expected_error_code": "SCHEMA_INVALID"
+    },
+    {
+      "name": "genesis_rule_seq1_zero_prev",
+      "receipt": {
+        "schema_version": "1.0.0",
+        "engine_id": "supreme_kernel",
+        "commit_sha": "e16c0daa0814db8fb80115a0937436e80113d9a3",
+        "wrapper_domain": "musicguard",
+        "timestamp_utc": "2026-11-25T12:00:01.000Z",
+        "sequence": 1,
+        "input_digest": "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0",
+        "verdict_payload": {
+          "verdict": "AI_ASSISTED",
+          "reason_codes": [
+            "STEM_SIGNATURE_MATCH"
+          ],
+          "rule_set": {
+            "id": "musicguard.forensics",
+            "version": "3.1.0"
+          },
+          "evidence_digests": [
+            "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0"
+          ],
+          "metrics": {
+            "confidence_bps": 8125,
+            "segments_flagged": 3
+          },
+          "determinism": {
+            "mode": "deterministic",
+            "fallback_used": false
+          }
+        },
+        "prev_receipt_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key_id": "ed25519:21fe31dfa154a261",
+          "value": "16cdaa1bd0273cf5d7ecf9b9c80f7841ae7e63313160cb971f51409f3bbe6b0d2503d444204f2cbf16af52cca406823c32b6cc02d1d316ef6e2ea69c10709200"
+        }
+      },
+      "expected_error_code": "SCHEMA_INVALID"
+    },
+    {
+      "name": "impossible_calendar_date",
+      "receipt": {
+        "schema_version": "1.0.0",
+        "engine_id": "supreme_kernel",
+        "commit_sha": "e16c0daa0814db8fb80115a0937436e80113d9a3",
+        "wrapper_domain": "musicguard",
+        "timestamp_utc": "2026-02-30T12:00:00.000Z",
+        "sequence": 1,
+        "input_digest": "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0",
+        "verdict_payload": {
+          "verdict": "AI_ASSISTED",
+          "reason_codes": [
+            "STEM_SIGNATURE_MATCH"
+          ],
+          "rule_set": {
+            "id": "musicguard.forensics",
+            "version": "3.1.0"
+          },
+          "evidence_digests": [
+            "26384ff164639d9a9cfd3d9253b9c2fa16a9d7d7b2253c3256580e0aa27a2da0"
+          ],
+          "metrics": {
+            "confidence_bps": 8125,
+            "segments_flagged": 3
+          },
+          "determinism": {
+            "mode": "deterministic",
+            "fallback_used": false
+          }
+        },
+        "prev_receipt_hash": "fbfa5f486310bb5fc752131acde131346c387fa28eb3e983e4744e524b70ddf2",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key_id": "ed25519:21fe31dfa154a261",
+          "value": "16cdaa1bd0273cf5d7ecf9b9c80f7841ae7e63313160cb971f51409f3bbe6b0d2503d444204f2cbf16af52cca406823c32b6cc02d1d316ef6e2ea69c10709200"
+        }
+      },
+      "expected_error_code": "TIMESTAMP_INVALID"
+    }
+  ],
+  "raw_negative": [
+    {
+      "name": "duplicate_key",
+      "text": "{\"a\":1,\"a\":2}",
+      "expected_error_code": "BODY_PARSE_ERROR"
+    },
+    {
+      "name": "fractional_number",
+      "text": "{\"a\":1.0}",
+      "expected_error_code": "BODY_PARSE_ERROR"
+    },
+    {
+      "name": "exponent_number",
+      "text": "{\"a\":1e3}",
+      "expected_error_code": "BODY_PARSE_ERROR"
+    },
+    {
+      "name": "lone_surrogate",
+      "text": "{\"a\":\"\\ud800\"}",
+      "expected_error_code": "BODY_PARSE_ERROR"
+    },
+    {
+      "name": "nan_literal",
+      "text": "{\"a\":NaN}",
+      "expected_error_code": "BODY_PARSE_ERROR"
+    },
+    {
+      "name": "trailing_data",
+      "text": "{\"a\":1} x",
+      "expected_error_code": "BODY_PARSE_ERROR"
+    },
+    {
+      "name": "unsafe_integer",
+      "text": "{\"a\":9007199254740992}",
+      "expected_error_code": "BODY_PARSE_ERROR"
+    }
+  ]
+}
