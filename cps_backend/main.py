@@ -20,7 +20,7 @@ from pydantic import BaseModel
 from starlette.datastructures import MutableHeaders
 
 from cps_backend.config import settings
-from cps_backend.routers import billing, clearcheck, governance, health, risk
+from cps_backend.routers import billing, clearcheck, governance, health, receipts, risk
 from cps_backend.schemas.common import ErrorResponse
 from cps_backend.utils.logging_setup import logger
 from cps_backend.utils.redaction import safe_validation_errors
@@ -66,6 +66,9 @@ fastapi_app.include_router(risk.router)
 fastapi_app.include_router(billing.router)
 fastapi_app.include_router(clearcheck.router)
 fastapi_app.include_router(governance.router)
+# ARKHEIA DVE verify-only receipt gateway (additive): /v1/verify-receipt,
+# /v1/public-keys. cps_backend holds no private signing keys.
+fastapi_app.include_router(receipts.router)
 
 
 @fastapi_app.middleware("http")

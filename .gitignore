@@ -1,3 +1,7 @@
 __pycache__/
 .pytest_cache/
 data/
+.env.arkheia-signing
+secrets/
+var/arkheia-ledger/
+vendor/arkheia-receipts/.venv-verify/

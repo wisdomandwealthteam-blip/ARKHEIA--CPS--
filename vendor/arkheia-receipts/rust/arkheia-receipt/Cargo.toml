@@ -1,0 +1,16 @@
+[package]
+name = "arkheia-receipt"
+version = "1.0.0"
+edition = "2021"
+rust-version = "1.75"
+description = "ARKHEIA DVE canonical receipts: strict JSON, RFC 8785 JCS, schema v1.0.0, Ed25519"
+authors = ["Eric A. Scott / ARKHEIA GROUP"]
+license = "LicenseRef-Proprietary"
+publish = false
+
+[dependencies]
+ed25519-dalek = "2.1"
+sha2 = "0.10"
+
+[lib]
+path = "src/lib.rs"

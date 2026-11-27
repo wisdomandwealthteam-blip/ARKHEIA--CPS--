@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "arkheia-receipt"
+version = "1.0.0"
+description = "ARKHEIA DVE canonical receipts: RFC 8785 JCS, strict JSON, schema v1.0.0, Ed25519"
+requires-python = ">=3.10"
+authors = [{ name = "Eric A. Scott / ARKHEIA GROUP" }]
+license = { text = "Proprietary" }
+dependencies = ["cryptography>=41"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7", "jsonschema>=4.18"]
+
+[tool.setuptools]
+packages = ["arkheia_receipt"]
+
+[tool.setuptools.package-data]
+arkheia_receipt = ["schema/*.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
