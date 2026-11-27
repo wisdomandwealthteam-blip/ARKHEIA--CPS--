@@ -1,0 +1,9 @@
+.venv-verify/
+node_modules/
+target/
+__pycache__/
+*.egg-info/
+.pytest_cache/
+.env.arkheia-signing
+secrets/
+var/
