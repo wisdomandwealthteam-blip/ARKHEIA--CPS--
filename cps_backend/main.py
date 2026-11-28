@@ -21,7 +21,7 @@ from starlette.datastructures import MutableHeaders
 
 from cps_backend.config import settings
 from cps_backend.routers import billing, clearcheck, governance, health, receipts, risk
-from cps_backend.routers import platform_checks
+from cps_backend.routers import clearance, platform_checks
 from cps_backend.schemas.common import ErrorResponse
 from cps_backend.utils.logging_setup import logger
 from cps_backend.utils.redaction import safe_validation_errors
@@ -68,9 +68,13 @@ fastapi_app.include_router(billing.router)
 fastapi_app.include_router(clearcheck.router)
 fastapi_app.include_router(governance.router)
 # ARKHEIA DVE verify-only receipt gateway (additive): /v1/verify-receipt,
-# /v1/public-keys. cps_backend holds no private signing keys.
+# /v1/public-keys. The DVE gateway holds no DVE private signing key;
+# clearance below uses a separate, domain-separated signing key.
 fastapi_app.include_router(receipts.router)
 fastapi_app.include_router(platform_checks.router)
+# ARKHEIA Mandate / Aegis-Swarm pre-execution verification (additive):
+# /api/mandate/verify, /api/aegis/evaluate, /api/clearance/head. 503 unless configured.
+fastapi_app.include_router(clearance.router)
 
 
 @fastapi_app.middleware("http")

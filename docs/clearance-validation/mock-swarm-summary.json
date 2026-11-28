@@ -1,0 +1,24 @@
+{
+  "burst_size": 256,
+  "chain": {
+    "head_hash": "ba324c9b651d076340a46dd83b84764d0b7e8a512613e3b77017927adc0b4ca2",
+    "length": 299,
+    "valid": true
+  },
+  "floor_ms": 25,
+  "head_hash": "ba324c9b651d076340a46dd83b84764d0b7e8a512613e3b77017927adc0b4ca2",
+  "limits": [
+    "Python is not instruction-level constant time; floor and padded work are tested separately.",
+    "Unauthenticated bad signatures do not quarantine claimed identities; trusted reports do.",
+    "JSONL engine supports a single process/worker; not a distributed ledger."
+  ],
+  "policy_version": "arkheia.mandate-aegis/1.0.0",
+  "receipt_count": 299,
+  "rejection_latency_ns": {
+    "max": 48473049,
+    "median": 43927198,
+    "min": 26855263
+  },
+  "result": "PASS",
+  "workers": 1
+}

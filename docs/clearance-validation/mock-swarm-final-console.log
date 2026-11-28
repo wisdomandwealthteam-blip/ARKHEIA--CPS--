@@ -1,0 +1,11 @@
+LIVE MOCK SWARM: cps_backend.main:app; real loopback HTTP; dedicated random Ed25519 keys
+Policy arkheia.mandate-aegis/1.0.0; latency floor 25 ms; single Uvicorn worker
+PASS legacy health / ClearCheck preview+locked report / Stripe fail-closed / DVE verify-only routes
+PASS ALLOW -> THROTTLE -> X*: drift 3 / 4300 / 8000 bps
+PASS X* absorbs 12 clean windows and clean mandate; survives full Uvicorn process restart
+PASS only valid authority-signed HUMAN_RELEASE exits X*; stale lease remains revoked; fresh lease restores ALLOW
+PASS immediate X* on authenticated Lamport regression, replay, budget/action violations and A2A scope expansion
+PASS invalid signature => opaque 403; no spoofed identity quarantine; signed trusted signature-failure => immediate X*
+PASS 256 concurrent burst rejections: no lost/duplicate receipt commits, X* unchanged
+PASS full chain: 299 receipts, contiguous seq, strictly increasing Lamport, SHA-256 and Ed25519; tampering detected
+MOCK SWARM ATTACK: PASS

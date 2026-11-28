@@ -5,3 +5,5 @@ stripe==17.1.0
 -e ./vendor/arkheia-receipts/python
 cryptography>=41
 pytest>=7
+httpx>=0.27
+jsonschema>=4.18

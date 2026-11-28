@@ -1,0 +1,574 @@
+{
+  "chain_length": 16,
+  "engine_public_key": "2bd36c6044a9a034d93fcda66808d7e9f35194fa0951e5192a2e86dd9af5f7cb",
+  "engine_public_key_id": "ed25519:2da43b930587673f",
+  "head_hash": "582d0852ae46c9d424ed7691ff5905d796efe709370bd42ffab29e8c79d3bd1b",
+  "policy_version": "arkheia.mandate-aegis/1.0.0",
+  "steps": [
+    {
+      "endpoint": "/api/mandate/verify",
+      "engine_lamport": 2,
+      "receipt_hash": "90740dec17d7f072f6db1b62b1d25d5388500ec41709a05b8de0d483d7f357c6",
+      "request": {
+        "actor": "6582493b38bb55cf992203ee679bb7d9be41fd8cf638a8c69bf8b0aea1007cb7",
+        "allocations": [
+          {
+            "bps": 6000,
+            "recipient": "treasury"
+          },
+          {
+            "bps": 4000,
+            "recipient": "ops"
+          }
+        ],
+        "delegations": [],
+        "lamport": 1,
+        "lease": {
+          "holder": "6582493b38bb55cf992203ee679bb7d9be41fd8cf638a8c69bf8b0aea1007cb7",
+          "issuer": "df6a20e65a93601888a5f51741be06934eb3b9da0225898ca3f3bc79c23d587b",
+          "lamport_issued": 0,
+          "lease_id": "5c7eea805fb5c69b9a24e7ff5e563adf",
+          "max_amount": "1000000000000000000000000",
+          "scopes": [
+            "payments.quote",
+            "payments.transfer"
+          ],
+          "sig": "8785789bf2d0ce5154ec6ccf4cfd50411fd2e2bbf061ce49827aa4e5754768fd79b9ebbe8a31cd7b9e40b9fed4acdcdbb4fba7022890c651b1f819629a70a006",
+          "swarm_id": "swarm-1",
+          "ttl": 5000
+        },
+        "mandate_id": "bc2a870e47830151c62bc2899a9b434d",
+        "pool": "1000000",
+        "sig": "451f491030f846a8b0e5aabe1ae61a046318e674d693b05e21c42dbe4e7a6017e9991a05dd5d8db06f176180ac3caba21f3b0c74b1c1a6b9126ea224af967d0b",
+        "tool_call": {
+          "mcp_method": "tools/call",
+          "mcp_name": "payments.transfer"
+        },
+        "type": "MANDATE"
+      },
+      "response_sha256": "8c0b876e22aec9800e6dfab24e819772c3e9c9a99e8d43281939c3ebdfd32fed",
+      "state_after": "ALLOW",
+      "status": 200,
+      "step": "01_allow_clear"
+    },
+    {
+      "endpoint": "/api/aegis/evaluate",
+      "engine_lamport": 4,
+      "receipt_hash": "5a51da2198d3b375e8272e64697b84820b3f9069f8b705828ddad06616bd71c8",
+      "request": {
+        "lamport": 3,
+        "sensor": "020612929c8a90fed273d480c13d5b042f04fc4a65c2419c50209fba4a4dbd54",
+        "sig": "8ae02d8a70cb2aa65bfa342267f7623e80850715728cf216cc5df85954c7367e2d6cca6473b3a7479a833ed8c4a9b15403d3fd1b9f181863bcd5f207047f830e",
+        "subject": "6582493b38bb55cf992203ee679bb7d9be41fd8cf638a8c69bf8b0aea1007cb7",
+        "type": "OBSERVATION",
+        "window": {
+          "fanout": 0,
+          "override_attempts": 0,
+          "reject_count": 10,
+          "request_count": 10,
+          "scope_violations": 0,
+          "signature_failures": 0
+        }
+      },
+      "response_sha256": "300798ca8e69e118fc544e56c63dab3d76b00fb218e78de7ff8e6e3626e2bc7a",
+      "state_after": "THROTTLE",
+      "status": 200,
+      "step": "02_drift_into_throttle"
+    },
+    {
+      "endpoint": "/api/mandate/verify",
+      "engine_lamport": 6,
+      "receipt_hash": "807b220d88a1c97faa7a1b8656f0d5603100a2aea54f1945e1a53a04b695d11f",
+      "request": {
+        "actor": "6582493b38bb55cf992203ee679bb7d9be41fd8cf638a8c69bf8b0aea1007cb7",
+        "allocations": [
+          {
+            "bps": 6000,
+            "recipient": "treasury"
+          },
+          {
+            "bps": 4000,
+            "recipient": "ops"
+          }
+        ],
+        "delegations": [],
+        "lamport": 5,
+        "lease": {
+          "holder": "6582493b38bb55cf992203ee679bb7d9be41fd8cf638a8c69bf8b0aea1007cb7",
+          "issuer": "df6a20e65a93601888a5f51741be06934eb3b9da0225898ca3f3bc79c23d587b",
+          "lamport_issued": 0,
+          "lease_id": "5c7eea805fb5c69b9a24e7ff5e563adf",
+          "max_amount": "1000000000000000000000000",
+          "scopes": [
+            "payments.quote",
+            "payments.transfer"
+          ],
+          "sig": "8785789bf2d0ce5154ec6ccf4cfd50411fd2e2bbf061ce49827aa4e5754768fd79b9ebbe8a31cd7b9e40b9fed4acdcdbb4fba7022890c651b1f819629a70a006",
+          "swarm_id": "swarm-1",
+          "ttl": 5000
+        },
+        "mandate_id": "95ce56e430e89f474a74b06ea9046cc5",
+        "pool": "1000000",
+        "sig": "941cd011a73f4edfae3f9a2d61d07952e54f21820082497d59673095f5a4ba94e135c4daf983c6520001fab4623b0c2d0479ff5bdae9ef8dea2c5799ba473107",
+        "tool_call": {
+          "mcp_method": "tools/call",
+          "mcp_name": "payments.transfer"
+        },
+        "type": "MANDATE"
+      },
+      "response_sha256": "b1882a92484fbcbb7d74105058b6e5625fa8d01198fd79bb5356a770d913044c",
+      "state_after": "THROTTLE",
+      "status": 403,
+      "step": "03_throttled_within_interval"
+    },
+    {
+      "endpoint": "/api/mandate/verify",
+      "engine_lamport": 18,
+      "receipt_hash": "ac09ca360b917ac0b6a420c89a4cbb501b279f2593804d9243534dab860152af",
+      "request": {
+        "actor": "6582493b38bb55cf992203ee679bb7d9be41fd8cf638a8c69bf8b0aea1007cb7",
+        "allocations": [
+          {
+            "bps": 6000,
+            "recipient": "treasury"
+          },
+          {
+            "bps": 4000,
+            "recipient": "ops"
+          }
+        ],
+        "delegations": [],
+        "lamport": 17,
+        "lease": {
+          "holder": "6582493b38bb55cf992203ee679bb7d9be41fd8cf638a8c69bf8b0aea1007cb7",
+          "issuer": "df6a20e65a93601888a5f51741be06934eb3b9da0225898ca3f3bc79c23d587b",
+          "lamport_issued": 0,
+          "lease_id": "5c7eea805fb5c69b9a24e7ff5e563adf",
+          "max_amount": "1000000000000000000000000",
+          "scopes": [
+            "payments.quote",
+            "payments.transfer"
+          ],
+          "sig": "8785789bf2d0ce5154ec6ccf4cfd50411fd2e2bbf061ce49827aa4e5754768fd79b9ebbe8a31cd7b9e40b9fed4acdcdbb4fba7022890c651b1f819629a70a006",
+          "swarm_id": "swarm-1",
+          "ttl": 5000
+        },
+        "mandate_id": "881cef060ed4fb4f3a1c8f46789b41f5",
+        "pool": "1000000",
+        "sig": "27dc3960f37c4d09a61edab313282e258d6f7869b4c3d2d2842cf3b5f0b8de9071cacf0216c48cabedb214b34b1806b9e7856920406a5d99803ba422d7da4d0c",
+        "tool_call": {
+          "mcp_method": "tools/call",
+          "mcp_name": "payments.transfer"
+        },
+        "type": "MANDATE"
+      },
+      "response_sha256": "d8136d94d1339b4b063fb7a5c8fdc1ea908bddba576e6a7a0110155fb06b94ac",
+      "state_after": "THROTTLE",
+      "status": 200,
+      "step": "04_throttle_interval_elapsed"
+    },
+    {
+      "endpoint": "/api/aegis/evaluate",
+      "engine_lamport": 20,
+      "receipt_hash": "193f69e5dd679df1f34bfb5c043a47cdbb15fac343bb618e54ee7b9012ece205",
+      "request": {
+        "lamport": 19,
+        "sensor": "020612929c8a90fed273d480c13d5b042f04fc4a65c2419c50209fba4a4dbd54",
+        "sig": "1176f87d0986590586374daec9a53c367a146ec53fc87004d3c050e7d2ec216f9f11b28e056e013ea8dd6ac86c308383866660ab083b7df0120eb89f9d7c9900",
+        "subject": "6582493b38bb55cf992203ee679bb7d9be41fd8cf638a8c69bf8b0aea1007cb7",
+        "type": "OBSERVATION",
+        "window": {
+          "fanout": 0,
+          "override_attempts": 0,
+          "reject_count": 1,
+          "request_count": 10,
+          "scope_violations": 0,
+          "signature_failures": 0
+        }
+      },
+      "response_sha256": "5b1f26c7cea6f28f149552daa59cf415d89856613a06e72c82c56fd050afb46e",
+      "state_after": "THROTTLE",
+      "status": 200,
+      "step": "05_clean_descent_0"
+    },
+    {
+      "endpoint": "/api/aegis/evaluate",
+      "engine_lamport": 22,
+      "receipt_hash": "601530e24b40e9a8a5d7b012321de96642a5a98c0d150b2b5f8d77a5d653ac93",
+      "request": {
+        "lamport": 21,
+        "sensor": "020612929c8a90fed273d480c13d5b042f04fc4a65c2419c50209fba4a4dbd54",
+        "sig": "3417893fcc3d2df51d499b97d1a8e7480798091df570c73e071dd52784f24c319cc5ba27e239c318049722811d76fdbbcf6d0071b60ad6a3c8e3283d87a04107",
+        "subject": "6582493b38bb55cf992203ee679bb7d9be41fd8cf638a8c69bf8b0aea1007cb7",
+        "type": "OBSERVATION",
+        "window": {
+          "fanout": 0,
+          "override_attempts": 0,
+          "reject_count": 1,
+          "request_count": 10,
+          "scope_violations": 0,
+          "signature_failures": 0
+        }
+      },
+      "response_sha256": "da658fde1e226b19f78a9caa707a79b57c31f40c330d3b53adfc539779bf1ce5",
+      "state_after": "THROTTLE",
+      "status": 200,
+      "step": "05_clean_descent_1"
+    },
+    {
+      "endpoint": "/api/aegis/evaluate",
+      "engine_lamport": 24,
+      "receipt_hash": "e0aa639ed14175c2b8e8ae994ae4f37451a56722cf502e26593417f4a586745b",
+      "request": {
+        "lamport": 23,
+        "sensor": "020612929c8a90fed273d480c13d5b042f04fc4a65c2419c50209fba4a4dbd54",
+        "sig": "40d25bb68a9e702ca07dc93fcb639da478dff3de1ff6456b083820b36c894ae8aa5321bbc66d3e40e9bf42981956fbbdf2add0b4f8f54b6a2efb2de4cce44f03",
+        "subject": "6582493b38bb55cf992203ee679bb7d9be41fd8cf638a8c69bf8b0aea1007cb7",
+        "type": "OBSERVATION",
+        "window": {
+          "fanout": 0,
+          "override_attempts": 0,
+          "reject_count": 1,
+          "request_count": 10,
+          "scope_violations": 0,
+          "signature_failures": 0
+        }
+      },
+      "response_sha256": "46a984389da2082c368dbba45ead3062dc3135fa7adb8e2d9dddb0a572377f0b",
+      "state_after": "ALLOW",
+      "status": 200,
+      "step": "05_clean_descent_2"
+    },
+    {
+      "endpoint": "/api/mandate/verify",
+      "engine_lamport": 26,
+      "receipt_hash": "afc3e56b02f47090206e0b8eb371727a58c01399c24f65cdc1d5c819d7ed9d80",
+      "request": {
+        "actor": "96dacc85d8846905865fb685200052e176cef3378bdf0067e5c719fb10ae2cc9",
+        "allocations": [
+          {
+            "bps": 6000,
+            "recipient": "treasury"
+          },
+          {
+            "bps": 4000,
+            "recipient": "ops"
+          }
+        ],
+        "delegations": [
+          {
+            "delegate": "96dacc85d8846905865fb685200052e176cef3378bdf0067e5c719fb10ae2cc9",
+            "delegator": "6582493b38bb55cf992203ee679bb7d9be41fd8cf638a8c69bf8b0aea1007cb7",
+            "lamport_issued": 1,
+            "lease_id": "5c7eea805fb5c69b9a24e7ff5e563adf",
+            "max_amount": "100000000000000000000",
+            "scopes": [
+              "payments.transfer",
+              "treasury.sweep"
+            ],
+            "sig": "d49bb23d12f23276c28b8d4dd42892ae08d895af653767b6afb9f9ed5967be874374518810c6a55f42493f04d130e19e98d85d1ef1c0d25116e0b938423d1304",
+            "ttl": 4000
+          }
+        ],
+        "lamport": 25,
+        "lease": {
+          "holder": "6582493b38bb55cf992203ee679bb7d9be41fd8cf638a8c69bf8b0aea1007cb7",
+          "issuer": "df6a20e65a93601888a5f51741be06934eb3b9da0225898ca3f3bc79c23d587b",
+          "lamport_issued": 0,
+          "lease_id": "5c7eea805fb5c69b9a24e7ff5e563adf",
+          "max_amount": "1000000000000000000000000",
+          "scopes": [
+            "payments.quote",
+            "payments.transfer"
+          ],
+          "sig": "8785789bf2d0ce5154ec6ccf4cfd50411fd2e2bbf061ce49827aa4e5754768fd79b9ebbe8a31cd7b9e40b9fed4acdcdbb4fba7022890c651b1f819629a70a006",
+          "swarm_id": "swarm-1",
+          "ttl": 5000
+        },
+        "mandate_id": "c36a87201055b60e1c6df0c073e68bc0",
+        "pool": "1000000",
+        "sig": "06ff7984131606057f298ef8e4ad393241b5c9f3667b9d021fcb33ac3358ccf3823cb34124dc9e89c5f7b57c71f1629bbccf2ff9d83a274bee635494fea02503",
+        "tool_call": {
+          "mcp_method": "tools/call",
+          "mcp_name": "payments.transfer"
+        },
+        "type": "MANDATE"
+      },
+      "response_sha256": "1666d8f87097a19a87b8f354e3ec7003336114b7fa7eeb12511046f435b1e5e1",
+      "state_after": "QUARANTINE_X_STAR",
+      "status": 403,
+      "step": "06_scope_escalation_quarantines_delegator"
+    },
+    {
+      "endpoint": "/api/aegis/evaluate",
+      "engine_lamport": 28,
+      "receipt_hash": "0468ede888911326907e90210de22307aa1e74f939accccc87bec1cf2588a34f",
+      "request": {
+        "lamport": 27,
+        "sensor": "020612929c8a90fed273d480c13d5b042f04fc4a65c2419c50209fba4a4dbd54",
+        "sig": "a4db454a7d0845ce4e1292cbd25ea3475364e6be2a6d72161dafb77293f326234d505907f19b36cdd1c4a0a78f77f5fc4013822d67d28b647d19670b7e47ce06",
+        "subject": "6582493b38bb55cf992203ee679bb7d9be41fd8cf638a8c69bf8b0aea1007cb7",
+        "type": "OBSERVATION",
+        "window": {
+          "fanout": 0,
+          "override_attempts": 0,
+          "reject_count": 0,
+          "request_count": 0,
+          "scope_violations": 0,
+          "signature_failures": 0
+        }
+      },
+      "response_sha256": "5bbdbf950758bf18268dac45db685534f20b5cefa6c424c131c8977a9bcad3ee",
+      "state_after": "QUARANTINE_X_STAR",
+      "status": 200,
+      "step": "07_x_star_absorbs_clean_observation"
+    },
+    {
+      "endpoint": "/api/mandate/verify",
+      "engine_lamport": 30,
+      "receipt_hash": "0d0869a30ff66b1b08f78b269c55e38cc0cf967c0e5d4e82b511dc7604dea982",
+      "request": {
+        "actor": "6582493b38bb55cf992203ee679bb7d9be41fd8cf638a8c69bf8b0aea1007cb7",
+        "allocations": [
+          {
+            "bps": 6000,
+            "recipient": "treasury"
+          },
+          {
+            "bps": 4000,
+            "recipient": "ops"
+          }
+        ],
+        "delegations": [],
+        "lamport": 29,
+        "lease": {
+          "holder": "6582493b38bb55cf992203ee679bb7d9be41fd8cf638a8c69bf8b0aea1007cb7",
+          "issuer": "df6a20e65a93601888a5f51741be06934eb3b9da0225898ca3f3bc79c23d587b",
+          "lamport_issued": 0,
+          "lease_id": "5c7eea805fb5c69b9a24e7ff5e563adf",
+          "max_amount": "1000000000000000000000000",
+          "scopes": [
+            "payments.quote",
+            "payments.transfer"
+          ],
+          "sig": "8785789bf2d0ce5154ec6ccf4cfd50411fd2e2bbf061ce49827aa4e5754768fd79b9ebbe8a31cd7b9e40b9fed4acdcdbb4fba7022890c651b1f819629a70a006",
+          "swarm_id": "swarm-1",
+          "ttl": 5000
+        },
+        "mandate_id": "e44a4742d557aedb599591153fa4eafe",
+        "pool": "1000000",
+        "sig": "7bf1a58562f10c4c328a336ede8a3bf0677c4ee17296e4d27f0d75a0d8a80b999abec3627ecdc8da9128998845e42e63ab1bb28eb910364c51f3363126dd3402",
+        "tool_call": {
+          "mcp_method": "tools/call",
+          "mcp_name": "payments.transfer"
+        },
+        "type": "MANDATE"
+      },
+      "response_sha256": "281a87572fa1c32a6f3af94082d7c9679d858777ad793f42e6680083997aacc9",
+      "state_after": "QUARANTINE_X_STAR",
+      "status": 403,
+      "step": "08_x_star_rejects_mandate"
+    },
+    {
+      "endpoint": "/api/aegis/evaluate",
+      "engine_lamport": 31,
+      "receipt_hash": "7110433427b0ec91b89aa179ec232e534f0dbececf34a2968d7dbcaac1a2d5a4",
+      "request": {
+        "approvals": [
+          {
+            "authority": "6582493b38bb55cf992203ee679bb7d9be41fd8cf638a8c69bf8b0aea1007cb7",
+            "sig": "72ec6818c6ccf2a9772c13702b6843600535d5b9eea8ae0428e125f3e7bd0063307001240d19a54424dca8e51f033a68e7b20f60b6cf0c452d27b13a5c6b7905"
+          }
+        ],
+        "invariant_check": {
+          "evidence_digest": "521e96baf7f1c0340522af46381dc049c4cf54bdc444c412ae95a3c1a72bf767",
+          "passed": true
+        },
+        "lamport": 31,
+        "nonce": "5c049645b0dbf5bec72b2d43e3408516",
+        "policy_version": "arkheia.mandate-aegis/1.0.0",
+        "quarantine_receipt_hash": "afc3e56b02f47090206e0b8eb371727a58c01399c24f65cdc1d5c819d7ed9d80",
+        "subject": "6582493b38bb55cf992203ee679bb7d9be41fd8cf638a8c69bf8b0aea1007cb7",
+        "type": "HUMAN_RELEASE"
+      },
+      "response_sha256": "ab375ee90fa0e8b3e4f186c37e0185970836dbbd5ff564cf6724f2a445e3cf67",
+      "state_after": "QUARANTINE_X_STAR",
+      "status": 403,
+      "step": "09_self_release_is_override_attempt"
+    },
+    {
+      "endpoint": "/api/aegis/evaluate",
+      "engine_lamport": 32,
+      "receipt_hash": "4a05eca43a480e9becac172d6486cf9a9205a1b337fb41f26ee8de87f1f6baf6",
+      "request": {
+        "approvals": [
+          {
+            "authority": "8cc71d4a8544ca1ec1c06450df4a6ad87ec6e2f76170169706b394f2f25309a5",
+            "sig": "25eede7df365917b2893da295a82ac608a5fd8192bb1d046d61ab93dfad64b5db6a0192576ad4876b72353555afc9499c8ffef1d50c55ef938d7f9597a4d830d"
+          }
+        ],
+        "invariant_check": {
+          "evidence_digest": "ea3f5d0994695d95cbf3a68fa2a4409e4b25b702ef210cb437a8e91825be336b",
+          "passed": true
+        },
+        "lamport": 32,
+        "nonce": "cba16cbcc5997cc50af515e352b06bb0",
+        "policy_version": "arkheia.mandate-aegis/1.0.0",
+        "quarantine_receipt_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "subject": "6582493b38bb55cf992203ee679bb7d9be41fd8cf638a8c69bf8b0aea1007cb7",
+        "type": "HUMAN_RELEASE"
+      },
+      "response_sha256": "64f0897c3eec91c0f246b8118b19a2113be7dce491104d2f8749f8337163a3e2",
+      "state_after": "QUARANTINE_X_STAR",
+      "status": 403,
+      "step": "10_release_wrong_quarantine_hash"
+    },
+    {
+      "endpoint": "/api/aegis/evaluate",
+      "engine_lamport": 34,
+      "receipt_hash": "e3854f9e1db61c7eb25a799c3ad2a6de3d325f481dc60f6cbc729e450b6d7844",
+      "request": {
+        "approvals": [
+          {
+            "authority": "8cc71d4a8544ca1ec1c06450df4a6ad87ec6e2f76170169706b394f2f25309a5",
+            "sig": "4b3e0bdbf2a53f1cf45daa6ea9117f10c13ef10f00a730da972af540db52e6fe9accc77541f9189bca7df34db38bafb731c74b8bb0a3c9e65ef19239bf2b0c02"
+          }
+        ],
+        "invariant_check": {
+          "evidence_digest": "cc1ed309a083b3b3b4547e6e6f910b63bc5980262d7e8128b4c56d8020ef7148",
+          "passed": true
+        },
+        "lamport": 33,
+        "nonce": "1ad987bb3f1576dc391458793411454d",
+        "policy_version": "arkheia.mandate-aegis/1.0.0",
+        "quarantine_receipt_hash": "afc3e56b02f47090206e0b8eb371727a58c01399c24f65cdc1d5c819d7ed9d80",
+        "subject": "6582493b38bb55cf992203ee679bb7d9be41fd8cf638a8c69bf8b0aea1007cb7",
+        "type": "HUMAN_RELEASE"
+      },
+      "response_sha256": "d15fdd1944656df1460bf9fb236b147920c02d127d0a9542ce40c41559717ff1",
+      "state_after": "HUMAN_RELEASE",
+      "status": 200,
+      "step": "11_signed_human_release"
+    },
+    {
+      "endpoint": "/api/mandate/verify",
+      "engine_lamport": 36,
+      "receipt_hash": "9e955473e1c8a8ad12f13ffb6361d3678fef7fc430be75144eceb3e1bb52ac0a",
+      "request": {
+        "actor": "6582493b38bb55cf992203ee679bb7d9be41fd8cf638a8c69bf8b0aea1007cb7",
+        "allocations": [
+          {
+            "bps": 6000,
+            "recipient": "treasury"
+          },
+          {
+            "bps": 4000,
+            "recipient": "ops"
+          }
+        ],
+        "delegations": [],
+        "lamport": 35,
+        "lease": {
+          "holder": "6582493b38bb55cf992203ee679bb7d9be41fd8cf638a8c69bf8b0aea1007cb7",
+          "issuer": "df6a20e65a93601888a5f51741be06934eb3b9da0225898ca3f3bc79c23d587b",
+          "lamport_issued": 0,
+          "lease_id": "5c7eea805fb5c69b9a24e7ff5e563adf",
+          "max_amount": "1000000000000000000000000",
+          "scopes": [
+            "payments.quote",
+            "payments.transfer"
+          ],
+          "sig": "8785789bf2d0ce5154ec6ccf4cfd50411fd2e2bbf061ce49827aa4e5754768fd79b9ebbe8a31cd7b9e40b9fed4acdcdbb4fba7022890c651b1f819629a70a006",
+          "swarm_id": "swarm-1",
+          "ttl": 5000
+        },
+        "mandate_id": "18f498c70f682ca7ffd223ef5c0723a8",
+        "pool": "1000000",
+        "sig": "a12a40b047f201af3ae91d5b248bd9a6dc9d7eb765d6e18ede99d82cfb749b083de84b7519f05448c6b45c05a9d3d898bff7ece4b1877b50d98ca37734c40c0c",
+        "tool_call": {
+          "mcp_method": "tools/call",
+          "mcp_name": "payments.transfer"
+        },
+        "type": "MANDATE"
+      },
+      "response_sha256": "43b323db2240c36a1b1f9ed682bb3ea513b1de726e9e031d6604e8f6bd8651ce",
+      "state_after": "HUMAN_RELEASE",
+      "status": 403,
+      "step": "12_pre_quarantine_lease_revoked"
+    },
+    {
+      "endpoint": "/api/mandate/verify",
+      "engine_lamport": 38,
+      "receipt_hash": "e4d1966626f6c52ab5ed2ca3ae5655abe2425a5e0bec30830fb1dd0e5ceb71d6",
+      "request": {
+        "actor": "6582493b38bb55cf992203ee679bb7d9be41fd8cf638a8c69bf8b0aea1007cb7",
+        "allocations": [
+          {
+            "bps": 6000,
+            "recipient": "treasury"
+          },
+          {
+            "bps": 4000,
+            "recipient": "ops"
+          }
+        ],
+        "delegations": [],
+        "lamport": 37,
+        "lease": {
+          "holder": "6582493b38bb55cf992203ee679bb7d9be41fd8cf638a8c69bf8b0aea1007cb7",
+          "issuer": "df6a20e65a93601888a5f51741be06934eb3b9da0225898ca3f3bc79c23d587b",
+          "lamport_issued": 37,
+          "lease_id": "ae081a327df50b80c989e0a94fbbbc3f",
+          "max_amount": "1000000000000000000000000",
+          "scopes": [
+            "payments.quote",
+            "payments.transfer"
+          ],
+          "sig": "1aea4c62a43bb555cae14178ea481f405e25f1061b69989bdc97812aed7f6744487c176be731057124dc7ebee8bf9c6edecc9ca01a84707b9a3c31b4a78b740f",
+          "swarm_id": "swarm-1",
+          "ttl": 5000
+        },
+        "mandate_id": "7e600db3e5e323a22b00186c3fd7e55c",
+        "pool": "1000000",
+        "sig": "cecac5abab8bedcd02f203a89d8cb56c74a7fb3786e34058634d7909662a0bf1330f6e9fe83589940bbfe2edd35e09d97e5b17c2883056b5f096a96b468be101",
+        "tool_call": {
+          "mcp_method": "tools/call",
+          "mcp_name": "payments.transfer"
+        },
+        "type": "MANDATE"
+      },
+      "response_sha256": "8240e5843ddc5a071d78ca8f920397df8c847481acf1381f222c9cd4b01ad8de",
+      "state_after": "ALLOW",
+      "status": 200,
+      "step": "13_fresh_lease_returns_to_allow"
+    },
+    {
+      "endpoint": "/api/aegis/evaluate",
+      "engine_lamport": 39,
+      "receipt_hash": "582d0852ae46c9d424ed7691ff5905d796efe709370bd42ffab29e8c79d3bd1b",
+      "request": {
+        "approvals": [
+          {
+            "authority": "8cc71d4a8544ca1ec1c06450df4a6ad87ec6e2f76170169706b394f2f25309a5",
+            "sig": "4b3e0bdbf2a53f1cf45daa6ea9117f10c13ef10f00a730da972af540db52e6fe9accc77541f9189bca7df34db38bafb731c74b8bb0a3c9e65ef19239bf2b0c02"
+          }
+        ],
+        "invariant_check": {
+          "evidence_digest": "cc1ed309a083b3b3b4547e6e6f910b63bc5980262d7e8128b4c56d8020ef7148",
+          "passed": true
+        },
+        "lamport": 33,
+        "nonce": "1ad987bb3f1576dc391458793411454d",
+        "policy_version": "arkheia.mandate-aegis/1.0.0",
+        "quarantine_receipt_hash": "afc3e56b02f47090206e0b8eb371727a58c01399c24f65cdc1d5c819d7ed9d80",
+        "subject": "6582493b38bb55cf992203ee679bb7d9be41fd8cf638a8c69bf8b0aea1007cb7",
+        "type": "HUMAN_RELEASE"
+      },
+      "response_sha256": "5b8c0d94e97272515b1ec33c6ad7d1426064fbac420de61a43851fc0f4233cfb",
+      "state_after": "ALLOW",
+      "status": 403,
+      "step": "14_release_replay_rejected"
+    }
+  ],
+  "warning": "TEST ONLY - every key is derived from a public label. Never use in production."
+}
