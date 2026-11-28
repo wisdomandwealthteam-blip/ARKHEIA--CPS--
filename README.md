@@ -1,7 +1,50 @@
-# ARKHEIA-CPS
+# ARKHEIA 7™ — Deterministic Agent Gate
 
-A FastAPI backend for deterministic auto and housing risk evaluation, with
-subscription billing via Stripe, plus the ClearCheck consumer frontend.
+**Version 1.0.1 · Brand 7™ · Publisher ARKHEIA GROUP**
+
+Website: [ericscott.ai](https://ericscott.ai).
+
+A deterministic pre-execution agent gate providing Mandate verification and
+Aegis-Swarm evaluation, exposed through the existing CPS FastAPI backend.
+The backend also retains deterministic auto and housing risk evaluation,
+subscription billing via Stripe, and the ClearCheck consumer frontend.
+
+This is a public product-branding update, not a package or API migration.
+Internal imports remain `cps_backend` and `arkheia_clearance`; existing
+routes, CORS configuration, error handling, and Stripe/ClearCheck flows remain
+compatible.
+
+## Public API metadata
+
+`GET /openapi.json` advertises the exact title
+`ARKHEIA 7™ — Deterministic Agent Gate` and product version `1.0.1`.
+Its `info.x-commercial` extension identifies the product, brand, version,
+publisher, website, and proprietary license. The OpenAPI contact uses
+ARKHEIA GROUP and the website above; no contact email or legal-document URL
+is declared. Interactive API documentation remains at `GET /docs`.
+
+### Existing endpoints
+
+- Clearance: `POST /api/mandate/verify`, `POST /api/aegis/evaluate`,
+  `GET /api/clearance/head`.
+- Health and risk: `GET /health`, `POST /risk/auto`, `POST /risk/housing`,
+  `POST /risk/aggregate`.
+- Billing: `POST /billing/create-checkout-session`,
+  `POST /billing/create-portal-session`, `GET /billing/status`,
+  `POST /billing/webhook` (intentionally omitted from the public schema).
+- ClearCheck: `POST /api/clearcheck/preview`, `POST /api/clearcheck/checkout`,
+  `GET /api/clearcheck/report/{check_id}`, `GET /api/clearcheck/trial/status`,
+  `POST /api/clearcheck/trial/portal`.
+- Governance: `POST /api/governance/check`,
+  `GET /api/governance/checks/{receipt_id}`.
+- Receipt gateway: `POST /v1/verify-receipt`, `GET /v1/public-keys`.
+- Platform checks: `POST /api/settlement/check`, `POST /api/provenance/check`,
+  `POST /api/custody/check`, `POST /api/edge/check`.
+
+## License
+
+Proprietary commercial software. Copyright (c) Eric A. Scott / ARKHEIA GROUP.
+All rights reserved. The public metadata does not grant an open-source license.
 
 ## Structure
 
@@ -9,6 +52,7 @@ Backend code lives at the repository root in `cps_backend/`:
 
 - `main.py` — FastAPI app assembly
 - `config.py` — environment-driven settings
+- `product_metadata.py` — public title, brand, version, publisher, website, and license
 - `routers/` — `/health`, `/risk/auto`, `/risk/housing`, `/risk/aggregate`, `/billing/*` endpoints
 - `services/` — risk evaluation logic, auth, rate limiting, billing, tier logic
 - `schemas/` — Pydantic request/response models

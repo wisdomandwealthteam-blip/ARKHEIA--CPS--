@@ -41,7 +41,7 @@ from typing import Any, Callable, Iterable, Mapping
 from . import aegis, wire
 from .aegis import ALLOW, HUMAN_RELEASE, THROTTLE, X_STAR, Mem
 from .conservation import ConservationError, Share, allocate
-from .policy import MCP_METHOD, MCP_PROTOCOL_VERSION, Policy
+from .policy import MCP_METHOD, MCP_PROTOCOL_VERSION, POLICY_VERSION, Policy
 from .receipts import Ledger, LedgerError, receipt_hash, sign_receipt
 from .schemas import (Mandate, Observation, Release, SigCheck, parse_mandate, parse_observation,
                       parse_release)
@@ -254,6 +254,9 @@ class ClearanceEngine:
 
         lease, hops, actor, t = m.lease, m.hops, m.actor, m.lamport
         chain = (lease, *hops)
+        # The receipt advances the global clock before any permit is issued.
+        # Request-time validity alone cannot authorize a last-tick or stale-clock permit.
+        issuance_lamport = max(self._clock, t) + 1
 
         # Stage 1/2 — authentication & linkage
         if headers.get("mcp-method", MCP_METHOD) != MCP_METHOD or \
@@ -304,7 +307,8 @@ class ClearanceEngine:
                     fails.append(("BUDGET_ESCALATION", g.grantor))
                 if g.lamport_issued < parent.lamport_issued or g.expiry > parent.expiry:
                     fails.append(("TTL_ESCALATION", g.grantor))
-            if not g.lamport_issued <= t < g.expiry:
+            if (not g.lamport_issued <= t < g.expiry
+                    or issuance_lamport >= min(g.expiry, WIRE_INT_MAX)):
                 fails.append(("LEASE_EXPIRED", actor))
         effective = chain[-1]
         if m.mcp_name not in effective.scopes:
@@ -500,6 +504,9 @@ class ClearanceEngine:
             return Response(403, opaque_rejection(h), h)
         if d.decision == "CLEARED":
             m = d.mandate
+            lease_expires_at = min(g.expiry for g in (m.lease, *m.hops))
+            lease_expires_at = min(lease_expires_at, WIRE_INT_MAX)
+            expires_at = min(receipt["lamport"] + self.policy.permit_ttl, lease_expires_at)
             permit = {
                 "schema": PERMIT_SCHEMA,
                 "policy_version": self.policy.policy_version,
@@ -510,7 +517,9 @@ class ClearanceEngine:
                 "allocations_digest": wire.sha256_hex(wire.jcs(d.effects["allocations"])),
                 "receipt_hash": h,
                 "issued_lamport": receipt["lamport"],
-                "not_after_lamport": receipt["lamport"] + self.policy.permit_ttl,
+                "not_after_lamport": expires_at,
+                "expires_at": expires_at,
+                "lease_expires_at": lease_expires_at,
             }
             permit["signature"] = {"algorithm": "Ed25519", "public_key_id": self._signer.key_id,
                                    "value": self._signer.sign_hex(wire.signing_input(wire.DOMAIN_PERMIT, permit, "signature"))}
@@ -530,13 +539,36 @@ def opaque_rejection(receipt_hash_hex: str) -> bytes:
                      "schema": REJECTION_SCHEMA})
 
 
-def verify_permit(permit: Mapping[str, Any], public_hex: str) -> bool:
+def verify_permit(permit: Mapping[str, Any], public_hex: str, *, current_lamport: int | None = None) -> bool:
+    """Verify a v1.0.1 signed, lease-bounded permit.
+
+    Supply the trusted current Lamport clock for live expiry enforcement.
+    Omitting it verifies signed bounds only; it is not execution authorization.
+    Legacy v1.0.0 permits lack the required signed bounds and fail closed.
+    """
     if type(permit) is not dict or type(permit.get("signature")) is not dict:
         return False
-    sig = permit["signature"].get("value")
-    if type(sig) is not str or len(sig) != 128:
+    if permit.get("schema") != PERMIT_SCHEMA or permit.get("policy_version") != POLICY_VERSION:
         return False
-    return wire.ed25519_verify(public_hex, sig, wire.signing_input(wire.DOMAIN_PERMIT, permit, "signature"))
+    issued, expires, lease_end = (permit.get(k) for k in ("issued_lamport", "expires_at", "lease_expires_at"))
+    if any(type(v) is not int or not 0 <= v <= WIRE_INT_MAX for v in (issued, expires, lease_end)):
+        return False
+    if (not issued < expires <= lease_end or type(permit.get("not_after_lamport")) is not int
+            or permit["not_after_lamport"] != expires):
+        return False
+    if current_lamport is not None:
+        if type(current_lamport) is not int or not issued <= current_lamport < expires:
+            return False
+    sig = permit["signature"].get("value")
+    if (permit["signature"].get("algorithm") != "Ed25519"
+            or type(sig) is not str or len(sig) != 128):
+        return False
+    try:
+        if permit["signature"].get("public_key_id") != wire.public_key_id(bytes.fromhex(public_hex)):
+            return False
+        return wire.ed25519_verify(public_hex, sig, wire.signing_input(wire.DOMAIN_PERMIT, permit, "signature"))
+    except (ValueError, TypeError, wire.CanonicalizationError):
+        return False
 
 
 def decode_reason(receipt: Mapping[str, Any], audit_key: bytes) -> str | None:

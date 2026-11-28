@@ -12,7 +12,7 @@ from dataclasses import dataclass
 
 from .u import BPS_SCALE, WIRE_INT_MAX
 
-POLICY_VERSION = "arkheia.mandate-aegis/1.0.0"
+POLICY_VERSION = "arkheia.mandate-aegis/1.0.1"
 MCP_PROTOCOL_VERSION = "2026-07-28"
 MCP_METHOD = "tools/call"
 

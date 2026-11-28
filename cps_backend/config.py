@@ -11,6 +11,8 @@ import os
 import re
 from dataclasses import dataclass, field
 
+from cps_backend.product_metadata import PRODUCT_TITLE
+
 
 def _clearcheck_price_cents() -> int | None:
     """Preserve valid integer settings; defer invalid configuration to checkout."""
@@ -57,7 +59,7 @@ def _allowed_origins() -> list[str]:
 
 @dataclass(frozen=True)
 class Settings:
-    app_name: str = "ARKHEIA-CPS"
+    app_name: str = PRODUCT_TITLE
     environment: str = os.environ.get("CPS_ENV", "development")
     log_level: str = os.environ.get("CPS_LOG_LEVEL", "INFO")
 

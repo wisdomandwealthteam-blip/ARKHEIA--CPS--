@@ -6,6 +6,8 @@
 | v0.2 | ClearCheck™ Live Verification |
 | v0.3 | Stripe Checkout & Report Unlock Gate |
 | v0.4 | ARKHEIA DVE™ Positioning & Multi-Module Suite |
+| Clearance v1.0.0 | Mandate/Aegis integration and live swarm handoff |
+| Clearance v1.0.1 | 7™ branding, lease-capped signed permits and issuance-time expiry rejection |
 
 ## Deployment Notes
 

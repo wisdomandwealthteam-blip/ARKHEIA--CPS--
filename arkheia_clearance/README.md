@@ -1,4 +1,4 @@
-# ARKHEIA Mandate™ + Aegis-Swarm™ — Clearance Engine v1.0.0
+# ARKHEIA 7™ — Deterministic Agent Gate v1.0.1
 
 Copyright (c) Eric A. Scott / ARKHEIA GROUP. All rights reserved.
 
@@ -9,6 +9,25 @@ and *ARKHEIA_Aegis_Swarm_Defense_Specification_v1.0*.
 
 The core here is framework-free (stdlib + `cryptography` + the vendored DVE `arkheia_receipt`
 JCS/strict-JSON). `cps_backend/routers/clearance.py` and `server.py` are thin wrappers around it.
+
+## v1.0.1 bounded permits
+
+Public brand: **7™**. Internal module paths remain `arkheia_clearance`.
+Policy: `arkheia.mandate-aegis/1.0.1`.
+
+All authority times are exclusive **Lamport ticks**, not UTC timestamps. A permit's
+signed `expires_at` (also exposed as the retained `not_after_lamport`) is
+`min(issued_lamport + permit_ttl, lease_expires_at)`. `lease_expires_at` is the
+earliest verified CUSTOS lease/delegation expiry, bounded by the wire integer horizon.
+Both the request tick and actual receipt/permit issuance tick must be inside the
+verified authority window. If issuance reaches expiry, the engine returns an
+opaque receipted 403 and does not issue a permit.
+
+Use `verify_permit(permit, trusted_public_key, current_lamport=trusted_clock)` to
+enforce the live validity interval. Omitting the clock checks signed bounds, not
+live authorization. The helper refuses legacy v1.0.0 permits that lack the signed
+expiry fields. Historical receipt ledgers remain replayable with the same key.
+See [v1.0.1 hardening notes](HARDENING_v1.0.1.md) for upgrade guidance.
 
 ## Laws → code
 

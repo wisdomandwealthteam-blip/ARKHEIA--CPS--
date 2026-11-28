@@ -244,11 +244,32 @@ class LiveCampaign:
         assert self.client.get("/v1/public-keys").status_code == 503
         self.say("PASS legacy health / ClearCheck preview+locked report / Stripe fail-closed / DVE verify-only routes")
 
+        info = self.client.get("/openapi.json").json()["info"]
+        assert info["title"] == "ARKHEIA 7™ — Deterministic Agent Gate"
+        assert info["version"] == "1.0.1" and info["x-commercial"]["brand"] == "7™"
+        capped_actor = self.agent()
+        capped_lease = A.lease(self.signers["issuer"], holder=capped_actor.public_hex,
+                               lease_id=self.ident("capped-lease"), scopes=("payments.transfer",),
+                               max_amount=1_000_000, lamport_issued=self.t(), ttl=4)
+        capped = self.post(MANDATE_EP, self.mandate(capped_actor, capped_lease), "live-permit-ttl-cap")
+        permit = capped["permit"]
+        assert permit["expires_at"] == permit["lease_expires_at"] == capped_lease["lamport_issued"] + 4
+        assert verify_permit(permit, self.signers["engine"].public_hex, current_lamport=permit["issued_lamport"])
+        expired_actor = self.agent()
+        expiring = A.lease(self.signers["issuer"], holder=expired_actor.public_hex,
+                           lease_id=self.ident("expired-at-issue"), scopes=("payments.transfer",),
+                           max_amount=1_000_000, lamport_issued=self.t(), ttl=1)
+        self.reject(self.mandate(expired_actor, expiring), "live-lease-expired-at-issuance", "LEASE_EXPIRED")
+        self.say("PASS 7™ v1.0.1 OpenAPI branding; signed permit TTL cap; expired-at-issuance lease => opaque 403")
+
         main = self.agent()
         old = self.lease(main)
         for i in range(3):
             body = self.post(MANDATE_EP, self.mandate(main, old), f"baseline-mandate-{i}")
-            assert body["decision"] == "CLEARED" and verify_permit(body["permit"], self.signers["engine"].public_hex)
+            permit = body["permit"]
+            assert body["decision"] == "CLEARED" and verify_permit(
+                permit, self.signers["engine"].public_hex, current_lamport=permit["issued_lamport"])
+            assert permit["issued_lamport"] < permit["expires_at"] <= permit["lease_expires_at"]
             assert sum(int(x["amount"]) for x in body["allocations"]) == 100
         clean = self.observe(main, "baseline-observation", state=ALLOW, request_count=1)
         mid = self.observe(main, "drift-throttle", state=THROTTLE, request_count=100, reject_count=80)

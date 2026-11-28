@@ -18,4 +18,4 @@ __all__ = [
     "MANDATE_EP", "POLICY_VERSION", "Policy", "RECEIPT_SCHEMA", "Response", "STATES", "Signer", "THROTTLE",
     "X_STAR", "decode_reason", "engine_from_env", "opaque_rejection", "receipt_hash", "verify_chain", "verify_permit",
 ]
-__version__ = "1.0.0"
+__version__ = "1.0.1"

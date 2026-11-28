@@ -15,7 +15,9 @@ def test_lease_window_boundaries(make_harness, world):
     lease = world.lease(a, issued=5, ttl=10)                         # valid for 5 <= t < 15
     assert h.mandate(world.mandate(a, lease, t=4, tag="early"))[1] == "LEASE_EXPIRED"
     assert h.mandate(world.mandate(a, lease, t=5, tag="first"))[0].status == 200
-    assert h.mandate(world.mandate(a, lease, t=14, tag="last"))[0].status == 200
+    assert h.mandate(world.mandate(a, lease, t=13, tag="last-usable"))[0].status == 200
+    # v1.0.1: request tick 14 would issue the receipt/permit at expired tick 15.
+    assert h.mandate(world.mandate(a, lease, t=14, tag="last"))[1] == "LEASE_EXPIRED"
     assert h.mandate(world.mandate(a, lease, t=15, tag="expired"))[1] == "LEASE_EXPIRED"
     assert h.state(a) == ALLOW  # soft when the policy says so
 

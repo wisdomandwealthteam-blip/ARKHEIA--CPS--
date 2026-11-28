@@ -1,5 +1,9 @@
 # Clearance v1.0.0 integration and live swarm handoff
 
+> Historical v1.0.0 evidence. The lease/permit blocker recorded below is corrected
+> by [7™ v1.0.1 hardening](HARDENING_v1.0.1.md); its current versioned contract and
+> validation results supersede the v1.0.0 release status.
+
 ## Status
 
 **Integration and specified mock-campaign checks pass against the supplied implementation. This is not a production execution-authority certification.** The lease/permit boundary issue below remains a release blocker for using permits as standalone authorization.

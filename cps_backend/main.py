@@ -20,6 +20,13 @@ from pydantic import BaseModel
 from starlette.datastructures import MutableHeaders
 
 from cps_backend.config import settings
+from cps_backend.product_metadata import (
+    PRODUCT_LICENSE,
+    PRODUCT_PUBLISHER,
+    PRODUCT_VERSION,
+    PRODUCT_WEBSITE,
+    commercial_metadata,
+)
 from cps_backend.routers import billing, clearcheck, governance, health, receipts, risk
 from cps_backend.routers import clearance, platform_checks
 from cps_backend.schemas.common import ErrorResponse
@@ -29,11 +36,15 @@ from cps_backend.utils.redaction import safe_validation_errors
 fastapi_app = FastAPI(
     title=settings.app_name,
     description=(
-        "Deterministic risk evaluation API for Auto and Housing contracts. "
+        "ARKHEIA 7™ is a deterministic pre-execution agent gate with Mandate "
+        "verification and Aegis-Swarm evaluation. Also preserves the existing "
+        "deterministic risk evaluation API for Auto and Housing contracts. "
         "Engine: ARKHEIA DVE™ | Architecture: PLATFORM-ARCHITECTURE-2026-V1 | "
         "Active modules: dve-clearcheck, dve-riskcheck."
     ),
-    version="0.2.0",
+    version=PRODUCT_VERSION,
+    contact={"name": PRODUCT_PUBLISHER, "url": PRODUCT_WEBSITE},
+    license_info={"name": PRODUCT_LICENSE},
 )
 
 # Production Frontend <-> Backend Integration
@@ -75,6 +86,19 @@ fastapi_app.include_router(platform_checks.router)
 # ARKHEIA Mandate / Aegis-Swarm pre-execution verification (additive):
 # /api/mandate/verify, /api/aegis/evaluate, /api/clearance/head. 503 unless configured.
 fastapi_app.include_router(clearance.router)
+
+# Extend FastAPI's normal, cached schema rather than rebuilding route metadata.
+# This retains schema visibility, security definitions, and operation IDs.
+_default_openapi = fastapi_app.openapi
+
+
+def product_openapi() -> dict:
+    schema = _default_openapi()
+    schema["info"]["x-commercial"] = commercial_metadata()
+    return schema
+
+
+fastapi_app.openapi = product_openapi
 
 
 @fastapi_app.middleware("http")
